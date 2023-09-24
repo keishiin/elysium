@@ -532,7 +532,7 @@ dependencies = [
  "itoa",
  "pq-sys",
  "r2d2",
- "uuid",
+ "uuid 1.4.1",
 ]
 
 [[package]]
@@ -858,6 +858,17 @@ name = "libc"
 version = "0.2.148"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9cdc71e17332e86d2e1d38c1f99edcb6288ee11b815fb1a4b049eaa2114d369b"
+
+[[package]]
+name = "listenfd"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "809e514e2cb8a9624701346ea3e694c1766d76778e343e537d873c1c366e79a7"
+dependencies = [
+ "libc",
+ "uuid 0.8.2",
+ "winapi",
+]
 
 [[package]]
 name = "local-channel"
@@ -1489,6 +1500,12 @@ dependencies = [
 
 [[package]]
 name = "uuid"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
+
+[[package]]
+name = "uuid"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79daa5ed5740825c40b389c5e50312b9c86df53fccd33f281df655642b43869d"
@@ -1584,11 +1601,13 @@ dependencies = [
  "diesel_migrations",
  "dotenv",
  "env_logger",
+ "lazy_static",
+ "listenfd",
  "log",
  "rand 0.7.3",
  "rust-argon2",
  "serde",
- "uuid",
+ "uuid 1.4.1",
 ]
 
 [[package]]

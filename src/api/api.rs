@@ -1,5 +1,5 @@
 use actix_web::web;
-use actix_web::{web::{ Json }, get, post, HttpResponse, Responder, Result};
+use actix_web::{web::Json, get, post, HttpResponse, Responder, Result};
 
 use crate::models::users::{User, UserRequest};
 use crate::models::response::Response;

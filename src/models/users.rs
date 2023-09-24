@@ -12,7 +12,7 @@ pub struct User {
     #[serde(default)]
     pub id: String,
     pub user_name: String,
-    #[serde(skip_serializing)]
+    // #[serde(skip_serializing)]
     pub password: String,
     pub email: String,
     pub steam_id: Option<String>,

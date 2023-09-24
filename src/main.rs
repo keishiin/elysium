@@ -9,7 +9,7 @@ async fn main() -> std::io::Result<()>{
     let user_db = repository::database::Database::new();
     let app_data = web::Data::new(user_db);
 
-    HttpServer::new(move || {
+    HttpServer::new( move || {
         App::new()
             .app_data(app_data.clone())
             .configure(api::api::config)

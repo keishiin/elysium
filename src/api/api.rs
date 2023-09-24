@@ -1,10 +1,7 @@
 use actix_web::web;
-use actix_web::{web::{
-    Data,
-    Json,
-}, get, post, HttpResponse, Responder, Result};
+use actix_web::{web::{ Json }, get, post, HttpResponse, Responder, Result};
 
-use crate::{models::users, repository::database::Database};
+use crate::models::users::{User, UserRequest};
 use crate::models::response::Response;
 
 #[get("/")]
@@ -31,8 +28,8 @@ pub async fn not_found() -> Result<HttpResponse> {
 }
 
 #[get("/user")]
-async fn get_user(user_id: Json<users::UserRequest>, data: Data<Database>) -> HttpResponse {
-    let user = data.get_user_by_id(&user_id.id);
+async fn get_user(user_id: Json<UserRequest>) -> HttpResponse {
+    let user = User::get_user_by_id(&user_id.id);
 
     match user {
         Some(user) => HttpResponse::Ok().json(user),
@@ -42,8 +39,8 @@ async fn get_user(user_id: Json<users::UserRequest>, data: Data<Database>) -> Ht
 }
 
 #[post("/user")]
-async fn create_user(new_user: Json<users::User>, database: Data<Database>) -> HttpResponse {
-    let user = database.create_user(new_user.into_inner());
+async fn create_user(new_user: Json<User>) -> HttpResponse {
+    let user = User::create_user(new_user.into_inner());
 
     match user {
         Ok(user) => HttpResponse::Ok().json(user),

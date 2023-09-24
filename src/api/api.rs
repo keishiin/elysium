@@ -2,9 +2,33 @@ use actix_web::web;
 use actix_web::{web::{
     Data,
     Json,
-}, get, post, HttpResponse};
+}, get, post, HttpResponse, Responder, Result};
 
 use crate::{models::users, repository::database::Database};
+use crate::models::response::Response;
+
+#[get("/")]
+async fn index() -> impl Responder {
+    let response = Response {
+        message: "use get and post on api/user".to_string(),
+    };
+    HttpResponse::Ok().json(response)
+}
+
+#[get("/health")]
+async fn healthcheck() -> impl Responder {
+    let response = Response {
+        message: "Everything is working fine".to_string(),
+    };
+    HttpResponse::Ok().json(response)
+}
+
+pub async fn not_found() -> Result<HttpResponse> {
+    let response = Response {
+        message: "Resource not found".to_string(),
+    };
+    Ok(HttpResponse::NotFound().json(response))
+}
 
 #[get("/user")]
 async fn get_user(user_id: Json<users::UserRequest>, data: Data<Database>) -> HttpResponse {

@@ -38,7 +38,7 @@ async fn signin(user_info: Json<UserRequest>) -> Result<HttpResponse, ApiError> 
     
     if is_correct_user {
         Ok(HttpResponse::Ok().json(user))
-    }else {
+    } else {
         Err(ApiError::new(401, "Credentials not valid!".to_string()))
     }
 }
@@ -48,5 +48,6 @@ pub fn auth_config(cfg: &mut web::ServiceConfig) {
         web::scope("/auth")
         .service(get_user)
         .service(signup)
+        .service(signin)
     );
 }

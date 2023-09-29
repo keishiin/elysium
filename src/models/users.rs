@@ -31,6 +31,23 @@ pub struct UserRequest {
     pub password: String
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct UserUpdateIdRequest {
+    pub steam_id: String, 
+    pub user_id: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UserUpdatePsnCodeRequest {
+    pub psn_code: String, 
+    pub user_id: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SignoutUserRequest {
+    pub id: String,
+}
+
 impl User {
 
     pub fn get_user_by_id(user_id: &str) -> Result<Self, Error> {
@@ -75,8 +92,44 @@ impl User {
         Ok(user)
     }
 
+    pub fn update_steam_id(user_id: &str, user_steam_id: &str) -> Result<Self, ApiError> {
+        let mut conn = Database::new().pool.get().unwrap();
+
+        let mut user = users
+            .find(user_id)
+            .get_result::<User>(&mut conn)
+            .expect("Expect loading user by id");
+
+        user.steam_id = Some(user_steam_id.to_string());
+
+        diesel::update(users.find(user_id))
+            .set(&user)
+            .execute(&mut conn)
+            .expect("Failed to update user's steam_id");
+
+        Ok(user)
+    }
+
+    pub fn update_psn_code(user_id: &str, user_psn_code: &str) -> Result<Self, ApiError> {
+        let mut conn = Database::new().pool.get().unwrap();
+
+        let mut user = users
+            .find(user_id)
+            .get_result::<User>(&mut conn)
+            .expect("Expect loading user by id");
+
+        user.psn_auth_code = Some(user_psn_code.to_string());
+
+        diesel::update(users.find(user_id))
+            .set(&user)
+            .execute(&mut conn)
+            .expect("Failed to update user's psn_aith_code");
+
+        Ok(user)
+    }
+
     pub fn hash_password(&mut self) -> Result<(), ApiError> {
-        let salt: [u8; 32] = rand::thread_rng().gen();
+        let salt: [u8; 32] = rand::thread_rng().gen(); 
         let config = Config::default();
 
         self.password = argon2::hash_encoded(self.password.as_bytes(), &salt, &config)

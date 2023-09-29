@@ -1607,6 +1607,7 @@ dependencies = [
  "rand 0.7.3",
  "rust-argon2",
  "serde",
+ "serde_json",
  "uuid 1.4.1",
 ]
 

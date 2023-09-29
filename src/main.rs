@@ -9,6 +9,7 @@ use std::env;
 mod api;
 mod models;
 mod repository;
+mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()>{
@@ -23,8 +24,7 @@ async fn main() -> std::io::Result<()>{
         App::new()
             .app_data(app_data.clone())
             .configure(api::api::config)
-            .service(api::api::index)
-            .service(api::api::healthcheck)
+            .configure(api::auth::auth_config)
             .default_service(web::route().to(api::api::not_found))
     });
 

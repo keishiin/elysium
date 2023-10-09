@@ -13,7 +13,10 @@ pub struct ApiError {
 
 impl ApiError {
     pub fn new(status_code: u16, message: String) -> ApiError {
-        ApiError { status_code, message }
+        ApiError {
+            status_code,
+            message,
+        }
     }
 }
 
@@ -45,10 +48,10 @@ impl ResponseError for ApiError {
             false => {
                 error!("{}", self.message);
                 "Internal server error".to_string()
-            },
+            }
         };
 
-        HttpResponse::build(status_code)
-            .json(json!({ "message": message }))
+        HttpResponse::build(status_code).json(json!({ "message": message }))
     }
 }
+

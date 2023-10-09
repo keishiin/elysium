@@ -1,14 +1,12 @@
 use actix_web::web;
 use actix_web::{ get, HttpResponse, Responder, Result};
+use serde_json::json;
 
 use crate::models::response::Response;
 
 #[get("/")]
 async fn index() -> impl Responder {
-    let response = Response {
-        message: "use get and post on api/user".to_string(),
-    };
-    HttpResponse::Ok().json(response)
+    HttpResponse::Ok().json(json!({"message": "use get and post on api/user"}))
 }
 
 #[get("/health")]

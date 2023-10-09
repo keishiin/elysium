@@ -2,3 +2,4 @@
 .env
 /migrations
 postgres.yaml
+.vscode/settings.json

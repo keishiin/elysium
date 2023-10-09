@@ -15,6 +15,6 @@ impl Database {
         let manager = ConnectionManager::<PgConnection>::new(database_url);
         let pool: DBPool = r2d2::Pool::builder().build(manager).expect("Failed to create pool");
 
-        Database { pool }
+        Self { pool }
     }
 }

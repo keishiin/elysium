@@ -54,4 +54,3 @@ impl ResponseError for ApiError {
         HttpResponse::build(status_code).json(json!({ "message": message }))
     }
 }
-

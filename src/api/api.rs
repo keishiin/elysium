@@ -5,7 +5,7 @@ use crate::models::response::Response;
 
 #[get("/")]
 async fn index() -> impl Responder {
-    HttpResponse::Ok().json(json!({"message": "use get and post on api/user"}))
+    return HttpResponse::Ok().json(json!({"message": "use get and post on api/user"}));
 }
 
 #[get("/health")]
@@ -13,14 +13,14 @@ async fn healthcheck() -> impl Responder {
     let response = Response {
         message: "Everything is working fine".to_string(),
     };
-    HttpResponse::Ok().json(response)
+    return HttpResponse::Ok().json(response);
 }
 
 pub async fn not_found() -> Result<HttpResponse> {
     let response = Response {
         message: "Resource not found".to_string(),
     };
-    Ok(HttpResponse::NotFound().json(response))
+    return Ok(HttpResponse::NotFound().json(response));
 }
 
 pub fn init_route_config(cfg: &mut web::ServiceConfig) {

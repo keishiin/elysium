@@ -30,9 +30,9 @@ async fn update_steam_id(
         let user: User = User::update_steam_id(&user_req.user_id, &user_req.steam_id)
             .expect("and error occure trying to update");
 
-        Ok(HttpResponse::Ok().json(user))
+        return Ok(HttpResponse::Ok().json(user));
     } else {
-        Err(ApiError::new(401, "Credentials not valid!".to_string()))
+        return Err(ApiError::new(401, "Credentials not valid!".to_string()));
     }
 }
 
@@ -47,9 +47,9 @@ async fn update_psn_code(
         let user: User = User::update_psn_code(&user_req.user_id, &user_req.psn_code)
             .expect("and error occure trying to update");
 
-        Ok(HttpResponse::Ok().json(user))
+        return Ok(HttpResponse::Ok().json(user));
     } else {
-        Err(ApiError::new(401, "Credentials not valid!".to_string()))
+        return Err(ApiError::new(401, "Credentials not valid!".to_string()));
     }
 }
 

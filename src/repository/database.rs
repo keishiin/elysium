@@ -17,7 +17,6 @@ impl Database {
             .build(manager)
             .expect("Failed to create pool");
 
-        Self { pool }
+        return Self { pool };
     }
 }
-

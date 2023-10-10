@@ -35,9 +35,9 @@ async fn signin(user_info: Json<UserRequest>, session: Session) -> Result<HttpRe
             .insert(format!("{}", &user.id), &user.id)
             .expect("session insert error");
         session.renew();
-        Ok(HttpResponse::Ok().json(user))
+        return Ok(HttpResponse::Ok().json(user));
     } else {
-        Err(ApiError::new(401, "Credentials not valid!".to_string()))
+        return Err(ApiError::new(401, "Credentials not valid!".to_string()));
     }
 }
 
@@ -50,9 +50,9 @@ async fn singout(
 
     if let Some(_) = id {
         session.purge();
-        Ok(HttpResponse::Ok().json(json!({"message": "Signout success!"})))
+        return Ok(HttpResponse::Ok().json(json!({"message": "Signout success!"})));
     } else {
-        Err(ApiError::new(401, "Unauthorized".to_string()))
+        return Err(ApiError::new(401, "Unauthorized".to_string()));
     }
 }
 

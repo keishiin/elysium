@@ -21,7 +21,9 @@ pub struct User {
     pub email: String,
     pub steam_id: Option<String>,
     pub psn_auth_code: Option<String>,
+    #[serde(skip_serializing)]
     pub created_at: Option<chrono::NaiveDateTime>,
+    #[serde(skip_serializing)]
     pub updated_at: Option<chrono::NaiveDateTime>,
 }
 
@@ -57,7 +59,7 @@ impl User {
             .get_result::<User>(&mut conn.pool.get().unwrap())
             .expect("Expect loading user by id");
 
-        Ok(user)
+        return Ok(user);
     }
 
     pub fn get_user_by_username(username: &String) -> Result<Self, ApiError> {
@@ -68,7 +70,7 @@ impl User {
             .first(&mut conn.pool.get().unwrap())
             .expect("error");
 
-        Ok(temp_user)
+        return Ok(temp_user);
     }
 
     pub fn create_user(user: User) -> Result<Self, Error> {
@@ -89,7 +91,7 @@ impl User {
             .execute(&mut conn.pool.get().unwrap())
             .expect("Error creating new user");
 
-        Ok(user)
+        return Ok(user);
     }
 
     pub fn update_steam_id(user_id: &str, user_steam_id: &str) -> Result<Self, ApiError> {
@@ -107,7 +109,7 @@ impl User {
             .execute(&mut conn)
             .expect("Failed to update user's steam_id");
 
-        Ok(user)
+        return Ok(user);
     }
 
     pub fn update_psn_code(user_id: &str, user_psn_code: &str) -> Result<Self, ApiError> {
@@ -125,7 +127,11 @@ impl User {
             .execute(&mut conn)
             .expect("Failed to update user's psn_aith_code");
 
-        Ok(user)
+        return Ok(user);
+    }
+
+    pub fn delete_user_by_id(user_id: String) -> Result<(), ApiError> {
+        return Ok(());
     }
 
     pub fn hash_password(&mut self) -> Result<(), ApiError> {
@@ -135,7 +141,7 @@ impl User {
         self.password = argon2::hash_encoded(self.password.as_bytes(), &salt, &config)
             .expect("failed to hash password");
 
-        Ok(())
+        return Ok(());
     }
 
     pub fn verify_password(&self, pwd: &[u8]) -> Result<bool, ApiError> {

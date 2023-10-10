@@ -130,8 +130,20 @@ impl User {
         return Ok(user);
     }
 
-    pub fn delete_user_by_id(user_id: String) -> Result<(), ApiError> {
-        return Ok(());
+    pub fn delete_user_by_id(user_id: String) -> Result<String, ApiError> {
+        let mut conn = Database::new().pool.get().unwrap();
+
+        let user = users
+            .find(&user_id)
+            .get_result::<User>(&mut conn)
+            .expect("Expect loading user by id");
+
+        if user.id == user_id {
+            let _rows_deleted = diesel::delete(users.filter(id.eq(user_id))).execute(&mut conn);
+            return Ok("deleted user".to_string());
+        } else {
+            return Err(ApiError::new(500, "failed to fetch!".to_string()));
+        }
     }
 
     pub fn hash_password(&mut self) -> Result<(), ApiError> {

@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::api;
+    use crate::models::users::User;
     use actix_web::{http::StatusCode, test, web, App};
     use serde_json::json;
     use serde_json::to_string;
@@ -71,5 +72,40 @@ mod tests {
 
         assert_ne!(resp_found.status(), StatusCode::NOT_FOUND);
         assert!(resp_found.status().is_success());
+    }
+
+    #[actix_web::test]
+    async fn test_user_creation() {
+        let mut app = test::init_service(
+            App::new()
+                .configure(api::auth::auth_route_config)
+                .default_service(web::route().to(api::api::not_found)),
+        )
+        .await;
+
+        let username = "testUser".to_string();
+        let request = json!({
+            "user_name": "testUser",
+            "password": "test123",
+            "email": "testUser@test.com",
+            "steam_id": null,
+            "psn_auth_code": null
+        });
+
+        let user: User = User::get_user_by_username(&username).expect("failed to find user");
+
+        if user.user_name != "" {
+            let resp = User::delete_user_by_id(user.id).expect("failed to delete user");
+
+            if resp == "deleted user" {
+                let response = test::TestRequest::post()
+                    .uri("/auth/signup")
+                    .set_json(&request)
+                    .send_request(&mut app)
+                    .await;
+
+                println!("Status: {:?}", response.status());
+            }
+        }
     }
 }

@@ -1,5 +1,4 @@
-use actix_web::web;
-use actix_web::{get, HttpResponse, Responder, Result};
+use actix_web::{get, web, HttpResponse, Responder, Result};
 use serde_json::json;
 
 use crate::models::response::Response;
@@ -24,7 +23,6 @@ pub async fn not_found() -> Result<HttpResponse> {
     Ok(HttpResponse::NotFound().json(response))
 }
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn init_route_config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/api").service(index).service(healthcheck));
 }
-

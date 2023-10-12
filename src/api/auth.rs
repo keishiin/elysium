@@ -7,7 +7,7 @@ use actix_web::{
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::models::users::{SignoutUserRequest, User, UserRequest};
+use crate::models::users::{User, UserRequest};
 use crate::utils::errors::ApiError;
 
 #[post("/signup")]
@@ -32,7 +32,7 @@ async fn signin(user_info: Json<UserRequest>, session: Session) -> Result<HttpRe
 
     if is_correct_user {
         session
-            .insert(format!("{}", &user.id), &user.id)
+            .insert("user_id", &user.id)
             .expect("session insert error");
         session.renew();
         return Ok(HttpResponse::Ok().json(user));
@@ -42,17 +42,17 @@ async fn signin(user_info: Json<UserRequest>, session: Session) -> Result<HttpRe
 }
 
 #[post("/signout")]
-async fn singout(
-    user: Json<SignoutUserRequest>,
-    session: Session,
-) -> Result<HttpResponse, ApiError> {
-    let id: Option<Uuid> = session.get(&user.id).expect("session get error");
+async fn signout(session: Session) -> Result<HttpResponse, ApiError> {
+    let session_user_id: Option<Uuid> = session.get("user_id").expect("err");
 
-    if let Some(_) = id {
-        session.purge();
+    if let Some(_) = session_user_id {
+        session.remove("user_id");
         return Ok(HttpResponse::Ok().json(json!({"message": "Signout success!"})));
     } else {
-        return Err(ApiError::new(401, "Unauthorized".to_string()));
+        return Err(ApiError::new(
+            401,
+            "Unauthorized: No user session found".to_string(),
+        ));
     }
 }
 
@@ -61,6 +61,6 @@ pub fn auth_route_config(cfg: &mut web::ServiceConfig) {
         web::scope("/auth")
             .service(signup)
             .service(signin)
-            .service(singout),
+            .service(signout),
     );
 }

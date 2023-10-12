@@ -2,9 +2,15 @@
 mod tests {
     use crate::api;
     use crate::models::users::User;
-    use actix_web::{http::StatusCode, test, web, App};
+    use actix_session::{storage::RedisActorSessionStore, SessionMiddleware};
+    use actix_web::{
+        http::{header, StatusCode},
+        test, web, App,
+    };
+    use dotenv::dotenv;
     use serde_json::json;
     use serde_json::to_string;
+    use std::env;
 
     #[actix_web::test]
     async fn test_index_get_status() {
@@ -93,19 +99,167 @@ mod tests {
         });
 
         let user: User = User::get_user_by_username(&username).expect("failed to find user");
+        let _resp = User::delete_user_by_id(user.id).expect("failed to delete user");
 
-        if user.user_name != "" {
-            let resp = User::delete_user_by_id(user.id).expect("failed to delete user");
+        let response = test::TestRequest::post()
+            .uri("/auth/signup")
+            .set_json(&request)
+            .send_request(&mut app)
+            .await;
 
-            if resp == "deleted user" {
-                let response = test::TestRequest::post()
-                    .uri("/auth/signup")
-                    .set_json(&request)
-                    .send_request(&mut app)
-                    .await;
+        assert!(response.status().is_success());
+    }
 
-                println!("Status: {:?}", response.status());
+    #[actix_web::test]
+    async fn test_user_creation_failed() {
+        let mut app = test::init_service(
+            App::new()
+                .configure(api::auth::auth_route_config)
+                .default_service(web::route().to(api::api::not_found)),
+        )
+        .await;
+
+        let request = json!({
+            "user_name": "pwd",
+            "password": "test123",
+            "email": "testUser@test.com",
+            "steam_id": null,
+            "psn_auth_code": null
+        });
+
+        let response = test::TestRequest::post()
+            .uri("/auth/signup")
+            .set_json(&request)
+            .send_request(&mut app)
+            .await;
+
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    #[actix_web::test]
+    async fn test_user_signin_failed() {
+        let mut app = test::init_service(
+            App::new()
+                .configure(api::auth::auth_route_config)
+                .default_service(web::route().to(api::api::not_found)),
+        )
+        .await;
+
+        let signin_request = json!({
+            "username": "pwd",
+            "password": "test12sdfsfsdfds3",
+        });
+
+        let signin_response = test::TestRequest::post()
+            .uri("/auth/signin")
+            .set_json(&signin_request)
+            .send_request(&mut app)
+            .await;
+
+        assert_eq!(signin_response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[actix_web::test]
+    async fn test_user_signin_success() {
+        let mut app = test::init_service(
+            App::new()
+                .configure(api::auth::auth_route_config)
+                .default_service(web::route().to(api::api::not_found)),
+        )
+        .await;
+
+        let signin_request = json!({
+            "username": "pwd",
+            "password": "test123",
+        });
+
+        let signin_response = test::TestRequest::post()
+            .uri("/auth/signin")
+            .set_json(&signin_request)
+            .send_request(&mut app)
+            .await;
+
+        assert_eq!(signin_response.status(), StatusCode::OK);
+    }
+
+    #[actix_web::test]
+    async fn test_user_signout_failed() {
+        let mut app = test::init_service(
+            App::new()
+                .configure(api::auth::auth_route_config)
+                .default_service(web::route().to(api::api::not_found)),
+        )
+        .await;
+
+        let response = test::TestRequest::post()
+            .uri("/auth/signout")
+            .send_request(&mut app)
+            .await;
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[actix_web::test]
+    async fn test_user_signout_success() {
+        dotenv().ok();
+        env_logger::init();
+
+        let redis_port = env::var("REDIS_PORT").expect("Redis port not set");
+        let redis_host = env::var("HOST").expect("Redis host not set");
+
+        let private_key = actix_web::cookie::Key::generate();
+
+        let mut app = test::init_service(
+            App::new()
+                .wrap(
+                    SessionMiddleware::builder(
+                        RedisActorSessionStore::new(format!("{}:{}", redis_host, redis_port)),
+                        private_key.clone(),
+                    )
+                    .build(),
+                )
+                .configure(api::auth::auth_route_config)
+                .default_service(web::route().to(api::api::not_found)),
+        )
+        .await;
+
+        let signin_request = json!({
+            "username": "test1234",
+            "password": "test123",
+        });
+
+        let signin_response = test::TestRequest::post()
+            .uri("/auth/signin")
+            .set_json(&signin_request)
+            .send_request(&mut app)
+            .await;
+
+        let head = signin_response.headers();
+
+        if let Some(c) = head.get(header::SET_COOKIE) {
+            let cookie = c.to_str().unwrap_or("header not in utf8");
+            let parts: Vec<&str> = cookie.split(";").collect();
+            let id = parts.iter().find(|&&part| part.trim().starts_with("id="));
+
+            match id {
+                Some(id) => {
+                    let id = id.trim_start_matches("id=").trim();
+                    let signout_response = test::TestRequest::post()
+                        .uri("/auth/signout")
+                        .insert_header(("Cookie", format!("id={};", id)))
+                        .send_request(&mut app)
+                        .await;
+
+                    assert_eq!(signout_response.status(), StatusCode::OK);
+                }
+                None => {
+                    // if it ever reaches here, the test should fail
+                    assert_eq!(1, 2);
+                }
             }
+        } else {
+            // if it ever reaches here, the test should also fail
+            assert_eq!(2, 4);
         }
     }
 }

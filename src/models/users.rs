@@ -45,11 +45,6 @@ pub struct UserUpdatePsnCodeRequest {
     pub user_id: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct SignoutUserRequest {
-    pub id: String,
-}
-
 impl User {
     pub fn get_user_by_id(user_id: &str) -> Result<Self, Error> {
         let conn = Database::new();
@@ -73,7 +68,7 @@ impl User {
         return Ok(temp_user);
     }
 
-    pub fn create_user(user: User) -> Result<Self, Error> {
+    pub fn create_user(user: User) -> Result<Self, diesel::result::Error> {
         let conn = Database::new();
 
         let mut user = User::from(user);
@@ -86,12 +81,13 @@ impl User {
             ..user
         };
 
-        diesel::insert_into(users)
+        match diesel::insert_into(users)
             .values(&user)
             .execute(&mut conn.pool.get().unwrap())
-            .expect("Error creating new user");
-
-        return Ok(user);
+        {
+            Ok(_) => Ok(user),
+            Err(e) => Err(e),
+        }
     }
 
     pub fn update_steam_id(user_id: &str, user_steam_id: &str) -> Result<Self, ApiError> {

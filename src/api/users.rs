@@ -24,11 +24,11 @@ async fn update_steam_id(
     user_req: Json<UserUpdateIdRequest>,
     session: Session,
 ) -> Result<HttpResponse, ApiError> {
-    let session_id: Option<Uuid> = session.get(&user_req.user_id).expect("not signed in");
+    let session_id: Option<Uuid> = session.get("user_id").expect("not signed in");
 
     if let Some(_) = session_id {
         let user: User = User::update_steam_id(&user_req.user_id, &user_req.steam_id)
-            .expect("and error occure trying to update");
+            .expect("and error occured trying to update");
 
         return Ok(HttpResponse::Ok().json(user));
     } else {
@@ -41,11 +41,11 @@ async fn update_psn_code(
     user_req: Json<UserUpdatePsnCodeRequest>,
     session: Session,
 ) -> Result<HttpResponse, ApiError> {
-    let session_id: Option<Uuid> = session.get(&user_req.user_id).expect("not signed in");
+    let session_id: Option<Uuid> = session.get("user_id").expect("not signed in");
 
     if let Some(_) = session_id {
         let user: User = User::update_psn_code(&user_req.user_id, &user_req.psn_code)
-            .expect("and error occure trying to update");
+            .expect("and error occured trying to update");
 
         return Ok(HttpResponse::Ok().json(user));
     } else {

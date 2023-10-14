@@ -3,6 +3,8 @@ use axum::{extract::State, http::StatusCode, Json};
 use sea_orm::{DatabaseConnection, Set};
 use uuid::Uuid;
 
+const COOKIE_NAME: &str = "x-auth-token";
+
 use crate::{
     models::users::{ResponseUser, User, UserRequest, UserSignOutRequest},
     queries::users_q::{create_user, get_user_by_id, get_user_by_username},
@@ -17,7 +19,7 @@ use axum::debug_handler;
 #[debug_handler]
 pub async fn signup(
     State(db): State<DatabaseConnection>,
-    cookie: Cookies,
+    cookies: Cookies,
     req_user: Json<User>,
 ) -> Result<Json<ResponseUser>, ApiError> {
     let mut new_user = users::ActiveModel {
@@ -33,7 +35,7 @@ pub async fn signup(
 
     let user = create_user(&db, new_user).await?;
 
-    cookie.add(Cookie::new("x-auth-token", "testing"));
+    cookies.add(Cookie::new(COOKIE_NAME, "testing"));
 
     Ok(Json(ResponseUser {
         id: user.id,
@@ -46,6 +48,7 @@ pub async fn signup(
 
 pub async fn signin(
     State(db): State<DatabaseConnection>,
+    cookies: Cookies,
     user_info: Json<UserRequest>,
 ) -> Result<Json<ResponseUser>, ApiError> {
     let user = get_user_by_username(&db, user_info.username.clone()).await?;
@@ -56,6 +59,8 @@ pub async fn signin(
             "Incorrect username/password",
         ));
     }
+
+    cookies.add(Cookie::new(COOKIE_NAME, "testing"));
 
     Ok(Json(ResponseUser {
         id: user.id,
@@ -68,6 +73,7 @@ pub async fn signin(
 
 pub async fn signout(
     State(db): State<DatabaseConnection>,
+    cookies: Cookies,
     user_req: Json<UserSignOutRequest>,
 ) -> Result<StatusCode, ApiError> {
     let user = get_user_by_id(&db, user_req.user_id.clone()).await?;
@@ -78,6 +84,8 @@ pub async fn signout(
             "Incorrect username/password",
         ));
     }
+
+    cookies.remove(Cookie::new(COOKIE_NAME, ""));
 
     Ok(StatusCode::OK)
 }

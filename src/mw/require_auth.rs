@@ -3,12 +3,14 @@ use axum::{
     middleware::Next,
     response::Response,
 };
+use tower_cookies::Cookies;
 
 use crate::utils::errors::ApiError;
 use tower_sessions::Session;
 
-pub async fn require_auth<T>(
+pub async fn _require_auth<T>(
     session: Session,
+    cookies: Cookies,
     headers: HeaderMap,
     request: Request<T>,
     next: Next<T>,
@@ -29,6 +31,8 @@ pub async fn require_auth<T>(
         eprintln!("Session not found: {:?}", error);
         ApiError::new(StatusCode::UNAUTHORIZED, "not authenticated/session get failed!")
     });
+
+    let _cookie = cookies.get("name");
 
     Ok(next.run(request).await)
 }

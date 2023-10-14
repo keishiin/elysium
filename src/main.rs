@@ -17,5 +17,5 @@ async fn main() {
 
     let state = AppState { db };
 
-    run(state).await;
+    let _ = run(state).await;
 }

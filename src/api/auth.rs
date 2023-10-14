@@ -11,9 +11,13 @@ use crate::{
         hash::{hash_password, verify_password},
     },
 };
+use tower_cookies::{Cookies, Cookie};
+use axum::debug_handler;
 
+#[debug_handler]
 pub async fn signup(
     State(db): State<DatabaseConnection>,
+    cookie: Cookies,
     req_user: Json<User>,
 ) -> Result<Json<ResponseUser>, ApiError> {
     let mut new_user = users::ActiveModel {
@@ -28,6 +32,8 @@ pub async fn signup(
     new_user.psn_auth_code = Set(req_user.psn_auth_code.clone());
 
     let user = create_user(&db, new_user).await?;
+
+    cookie.add(Cookie::new("x-auth-token", "testing"));
 
     Ok(Json(ResponseUser {
         id: user.id,
@@ -50,11 +56,6 @@ pub async fn signin(
             "Incorrect username/password",
         ));
     }
-
-    // set up the token auth token/session
-    //let mut user = user.into_active_model();
-    // set token here
-    //let user = save_user(&db, user).await?;
 
     Ok(Json(ResponseUser {
         id: user.id,

@@ -1,63 +1,67 @@
-use actix_session::Session;
-use actix_web::{
-    get, put,
-    web::{self, Json},
-    HttpResponse,
+use axum::{extract::State, http::StatusCode, Json};
+
+use crate::models::users::{
+    ResponseUser, UserRequest, UserUpdateIdRequest, UserUpdatePsnCodeRequest,
 };
-use uuid::Uuid;
-
-use crate::models::users::{User, UserRequest, UserUpdateIdRequest, UserUpdatePsnCodeRequest};
+use crate::queries::users_q::{
+    get_user_by_id, get_user_by_username, update_psn_code_save, update_steam_id_save,
+};
 use crate::utils::errors::ApiError;
+use crate::utils::hash::verify_password;
+use sea_orm::DatabaseConnection;
 
-#[get("/user")]
-async fn get_user(user_id: Json<UserRequest>) -> HttpResponse {
-    let user = User::get_user_by_id(&user_id.username);
+pub async fn get_user(
+    State(db): State<DatabaseConnection>,
+    user_info: Json<UserRequest>,
+) -> Result<Json<ResponseUser>, ApiError> {
+    let user = get_user_by_username(&db, user_info.username.clone()).await?;
 
-    match user {
-        Ok(user) => HttpResponse::Ok().json(user),
-        Err(_err) => HttpResponse::InternalServerError().body("User not found"),
+    if !verify_password(&user_info.password, &user.password)? {
+        return Err(ApiError::new(
+            StatusCode::UNAUTHORIZED,
+            "Incorrect username/password",
+        ));
     }
+
+    Ok(Json(ResponseUser {
+        id: user.id,
+        username: user.user_name,
+        email: user.email,
+        steam_id: user.steam_id,
+        psn_auth_code: user.psn_auth_code,
+    }))
 }
 
-#[put("/update/steamId")]
-async fn update_steam_id(
-    user_req: Json<UserUpdateIdRequest>,
-    session: Session,
-) -> Result<HttpResponse, ApiError> {
-    let session_id: Option<Uuid> = session.get("user_id").expect("not signed in");
+pub async fn update_steam_id(
+    State(db): State<DatabaseConnection>,
+    user_info: Json<UserUpdateIdRequest>,
+) -> Result<Json<ResponseUser>, ApiError> {
+    let user = get_user_by_id(&db, user_info.user_id.clone()).await?;
 
-    if let Some(_) = session_id {
-        let user: User = User::update_steam_id(&user_req.user_id, &user_req.steam_id)
-            .expect("and error occured trying to update");
+    update_steam_id_save(&db, user.clone(), user_info.steam_id.clone()).await?;
 
-        return Ok(HttpResponse::Ok().json(user));
-    } else {
-        return Err(ApiError::new(401, "Credentials not valid!".to_string()));
-    }
+    Ok(Json(ResponseUser {
+        id: user.id,
+        username: user.user_name,
+        email: user.email,
+        steam_id: Some(user_info.steam_id.clone()),
+        psn_auth_code: user.psn_auth_code,
+    }))
 }
 
-#[put("/update/psn_code")]
-async fn update_psn_code(
-    user_req: Json<UserUpdatePsnCodeRequest>,
-    session: Session,
-) -> Result<HttpResponse, ApiError> {
-    let session_id: Option<Uuid> = session.get("user_id").expect("not signed in");
+pub async fn update_psn_code(
+    State(db): State<DatabaseConnection>,
+    user_info: Json<UserUpdatePsnCodeRequest>,
+) -> Result<Json<ResponseUser>, ApiError> {
+    let user = get_user_by_id(&db, user_info.user_id.clone()).await?;
 
-    if let Some(_) = session_id {
-        let user: User = User::update_psn_code(&user_req.user_id, &user_req.psn_code)
-            .expect("and error occured trying to update");
+    update_psn_code_save(&db, user.clone(), user_info.psn_code.clone()).await?;
 
-        return Ok(HttpResponse::Ok().json(user));
-    } else {
-        return Err(ApiError::new(401, "Credentials not valid!".to_string()));
-    }
-}
-
-pub fn user_route_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/users")
-            .service(get_user)
-            .service(update_steam_id)
-            .service(update_psn_code),
-    );
+    Ok(Json(ResponseUser {
+        id: user.id,
+        username: user.user_name,
+        email: user.email,
+        steam_id: user.steam_id,
+        psn_auth_code: Some(user_info.psn_code.clone()),
+    }))
 }

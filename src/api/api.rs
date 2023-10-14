@@ -1,28 +1,25 @@
-use actix_web::{get, web, HttpResponse, Responder, Result};
-use serde_json::json;
+use axum::{http::StatusCode, Json};
 
 use crate::models::response::Response;
 
-#[get("/")]
-async fn index() -> impl Responder {
-    return HttpResponse::Ok().json(json!({"message": "use get and post on api/user"}));
+pub async fn root() -> &'static str {
+    "Hello, World!"
 }
 
-#[get("/health")]
-async fn healthcheck() -> impl Responder {
+pub async fn index() -> (StatusCode, Json<Response>) {
+    let response = Response {
+        message: "use get and post on api/user".to_string(),
+    };
+    return (StatusCode::OK, Json(response));
+}
+
+pub async fn healthcheck() -> (StatusCode, Json<Response>) {
     let response = Response {
         message: "Everything is working fine".to_string(),
     };
-    return HttpResponse::Ok().json(response);
+    return (StatusCode::OK, Json(response));
 }
 
-pub async fn not_found() -> Result<HttpResponse> {
-    let response = Response {
-        message: "Resource not found".to_string(),
-    };
-    return Ok(HttpResponse::NotFound().json(response));
-}
-
-pub fn init_route_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/api").service(index).service(healthcheck));
+pub async fn fallback() -> (StatusCode, &'static str) {
+    (StatusCode::NOT_FOUND, "Not Found")
 }

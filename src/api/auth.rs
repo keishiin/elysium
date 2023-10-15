@@ -1,10 +1,3 @@
-use ::entity::users;
-use axum::{extract::State, http::StatusCode, Json};
-use sea_orm::{DatabaseConnection, Set};
-use uuid::Uuid;
-
-const COOKIE_NAME: &str = "x-auth-token";
-
 use crate::{
     models::users::{ResponseUser, User, UserRequest, UserSignOutRequest},
     queries::users_q::{create_user, get_user_by_id, get_user_by_username},
@@ -13,13 +6,17 @@ use crate::{
         hash::{hash_password, verify_password},
     },
 };
-use tower_cookies::{Cookies, Cookie};
+use ::entity::users;
 use axum::debug_handler;
+use axum::{extract::State, http::StatusCode, Json};
+use sea_orm::{DatabaseConnection, Set};
+use tower_sessions::Session;
+use uuid::Uuid;
 
 #[debug_handler]
 pub async fn signup(
     State(db): State<DatabaseConnection>,
-    cookies: Cookies,
+    session: Session,
     req_user: Json<User>,
 ) -> Result<Json<ResponseUser>, ApiError> {
     let mut new_user = users::ActiveModel {
@@ -34,8 +31,14 @@ pub async fn signup(
     new_user.psn_auth_code = Set(req_user.psn_auth_code.clone());
 
     let user = create_user(&db, new_user).await?;
-
-    cookies.add(Cookie::new(COOKIE_NAME, "testing"));
+    let session_key = format!("user_{}", &user.id);
+    session.insert("user_id", &user.id).map_err(|err| {
+        eprintln!("Session insert error: {:?}", err);
+        ApiError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Something went wrong creating a session",
+        )
+    });
 
     Ok(Json(ResponseUser {
         id: user.id,
@@ -46,9 +49,10 @@ pub async fn signup(
     }))
 }
 
+#[debug_handler]
 pub async fn signin(
     State(db): State<DatabaseConnection>,
-    cookies: Cookies,
+    session: Session,
     user_info: Json<UserRequest>,
 ) -> Result<Json<ResponseUser>, ApiError> {
     let user = get_user_by_username(&db, user_info.username.clone()).await?;
@@ -59,8 +63,14 @@ pub async fn signin(
             "Incorrect username/password",
         ));
     }
-
-    cookies.add(Cookie::new(COOKIE_NAME, "testing"));
+    let session_key = format!("user_{}", &user.id);
+    session.insert("user_id", &user.id).map_err(|err| {
+        eprintln!("Session insert error: {:?}", err);
+        ApiError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Something went wrong creating a session",
+        )
+    });
 
     Ok(Json(ResponseUser {
         id: user.id,
@@ -71,21 +81,22 @@ pub async fn signin(
     }))
 }
 
+#[debug_handler]
 pub async fn signout(
-    State(db): State<DatabaseConnection>,
-    cookies: Cookies,
+    session: Session,
     user_req: Json<UserSignOutRequest>,
 ) -> Result<StatusCode, ApiError> {
-    let user = get_user_by_id(&db, user_req.user_id.clone()).await?;
 
-    if !verify_password(&user_req.password, &user.password)? {
+    let user_id = &user_req.user_id;
+    let session_key = format!("user_{}", user_id);
+    let value: Option<usize> = session.remove("user_id").unwrap_or_default();
+
+    if !value.is_none() {
         return Err(ApiError::new(
-            StatusCode::UNAUTHORIZED,
-            "Incorrect username/password",
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Not signed in!",
         ));
     }
-
-    cookies.remove(Cookie::new(COOKIE_NAME, ""));
 
     Ok(StatusCode::OK)
 }

@@ -38,7 +38,7 @@ pub async fn run(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
         .layer(
             SessionManagerLayer::new(session_store)
                 .with_secure(false)
-                .with_max_age(Duration::hours(1)),
+                .with_name("axum-session")
         );
 
     let router = create_router(state);

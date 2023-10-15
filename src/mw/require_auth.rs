@@ -5,12 +5,14 @@
 // };
 // use hyper::StatusCode;
 // use tower_cookies::Cookies;
+// use tower_sessions::Session;
 
 // use crate::utils::errors::ApiError;
 
 // pub async fn require_auth<T>(
 //     cookies: Cookies,
 //     _headers: HeaderMap,
+//     session: Session,
 //     request: Request<T>,
 //     next: Next<T>,
 // ) -> Result<Response, ApiError> {
@@ -26,7 +28,9 @@
 //     //     ));
 //     // };
 
-//     let cookie = cookies.get("x-auth-token").map(|c| c.value().to_string());
+//     let cookie = cookies.get("tower.sid").map(|c| c.value().to_string());
+
+
 
 //     cookie.ok_or(ApiError::new(StatusCode::UNAUTHORIZED, "Not Authenticated!"))?;
 

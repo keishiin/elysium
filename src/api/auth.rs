@@ -31,8 +31,8 @@ pub async fn signup(
     new_user.psn_auth_code = Set(req_user.psn_auth_code.clone());
 
     let user = create_user(&db, new_user).await?;
-    let session_key = format!("user_{}", &user.id);
-    session.insert("user_id", &user.id).map_err(|err| {
+    let session_key = format!("user_{}", user.id);
+    session.insert(&session_key, &user.id).map_err(|err| {
         eprintln!("Session insert error: {:?}", err);
         ApiError::new(
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -63,8 +63,8 @@ pub async fn signin(
             "Incorrect username/password",
         ));
     }
-    let session_key = format!("user_{}", &user.id);
-    session.insert("user_id", &user.id).map_err(|err| {
+    let session_key = format!("user_{}", user.id);
+    session.insert(&session_key, &user.id).map_err(|err| {
         eprintln!("Session insert error: {:?}", err);
         ApiError::new(
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -88,15 +88,12 @@ pub async fn signout(
 ) -> Result<StatusCode, ApiError> {
 
     let user_id = &user_req.user_id;
-    let session_key = format!("user_{}", user_id);
-    let value: Option<usize> = session.remove("user_id").unwrap_or_default();
+    let session_key = format!("user_{}", &user_id);
+    let value: Option<usize> = session.remove(&session_key).unwrap_or_default();
 
-    if !value.is_none() {
-        return Err(ApiError::new(
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Not signed in!",
-        ));
+    match value {
+        Some(_) => Ok(StatusCode::INTERNAL_SERVER_ERROR),
+        None => Ok(StatusCode::OK)
     }
 
-    Ok(StatusCode::OK)
 }

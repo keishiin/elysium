@@ -1,38 +1,41 @@
-// use axum::{
-//     http::{HeaderMap, Request},
-//     middleware::Next,
-//     response::Response,
-// };
-// use hyper::StatusCode;
-// use tower_cookies::Cookies;
-// use tower_sessions::Session;
+use axum::{
+    http::{HeaderMap, Request},
+    middleware::Next,
+    response::Response,
+};
+use hyper::{StatusCode, header::COOKIE};
 
-// use crate::utils::errors::ApiError;
+use crate::utils::{errors::ApiError, jwt_auth_utils::validate_token};
 
-// pub async fn require_auth<T>(
-//     cookies: Cookies,
-//     _headers: HeaderMap,
-//     session: Session,
-//     request: Request<T>,
-//     next: Next<T>,
-// ) -> Result<Response, ApiError> {
-//     // let header_token = if let Some(token) = headers.get("x-auth-token") {
-//     //     token.to_str().map_err(|error| {
-//     //         eprintln!("Error extracting token from headers: {:?}", error);
-//     //         ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error reading token")
-//     //     })?
-//     // } else {
-//     //     return Err(ApiError::new(
-//     //         StatusCode::UNAUTHORIZED,
-//     //         "not authenticated!",
-//     //     ));
-//     // };
-
-//     let cookie = cookies.get("tower.sid").map(|c| c.value().to_string());
+pub async fn require_auth<T>(
+    headers: HeaderMap,
+    request: Request<T>,
+    next: Next<T>,
+) -> Result<Response, ApiError> {
+    let header_token = if let Some(token) = headers.get(COOKIE) {
+        token.to_str().map_err(|error| {
+            eprintln!("Error extracting token from headers: {:?}", error);
+            ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error reading token")
+        })?
+    } else {
+        return Err(ApiError::new(
+            StatusCode::UNAUTHORIZED,
+            "not authenticated!",
+        ));
+    };
 
 
+    let value = split_by_double_quotes(header_token).ok_or_else(|| {
+        ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format")
+    })?;
 
-//     cookie.ok_or(ApiError::new(StatusCode::UNAUTHORIZED, "Not Authenticated!"))?;
+    validate_token(value)?;
 
-//     Ok(next.run(request).await)
-// }
+    Ok(next.run(request).await)
+}
+
+fn split_by_double_quotes(input: &str) -> Option<&str> {
+    let start = input.find('"')? + 1;
+    let end = input.rfind('"')?;
+    Some(&input[start..end])
+}

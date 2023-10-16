@@ -3,7 +3,6 @@ use std::net::SocketAddr;
 use app_state::AppState;
 use axum::{error_handling::HandleErrorLayer, BoxError};
 use hyper::StatusCode;
-use time::Duration;
 use tower::ServiceBuilder;
 use tower_sessions::{fred::prelude::*, RedisStore, SessionManagerLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};

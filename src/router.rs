@@ -5,12 +5,11 @@ use crate::{
         users::{get_user, update_psn_code, update_steam_id},
     },
     app_state::AppState,
-    // mw::require_auth::require_auth,
+    mw::require_auth::require_auth,
 };
 use axum::{
-    // middleware,
     routing::{get, post, put},
-    Router,
+    Router, middleware,
 };
 use tower_http::trace::TraceLayer;
 
@@ -20,7 +19,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/users/psn_code", put(update_psn_code))
         .route("/users/steam_id", put(update_steam_id))
         .route("/auth/signout", post(signout))
-        // .route_layer(middleware::from_fn(require_auth))
+        .route_layer(middleware::from_fn(require_auth))
         .route("/", get(root))
         .route("/index", get(index))
         .route("/health", get(healthcheck))

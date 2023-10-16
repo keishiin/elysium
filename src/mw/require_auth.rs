@@ -5,7 +5,7 @@ use axum::{
 };
 use hyper::{StatusCode, header::COOKIE};
 
-use crate::utils::{errors::ApiError, jwt_auth_utils::validate_token};
+use crate::utils::{errors::ApiError, jwt_auth_utils::validate_token, middware_utils::split_by_double_quotes};
 
 pub async fn require_auth<T>(
     headers: HeaderMap,
@@ -24,7 +24,6 @@ pub async fn require_auth<T>(
         ));
     };
 
-
     let value = split_by_double_quotes(header_token).ok_or_else(|| {
         ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format")
     })?;
@@ -32,10 +31,4 @@ pub async fn require_auth<T>(
     validate_token(value)?;
 
     Ok(next.run(request).await)
-}
-
-fn split_by_double_quotes(input: &str) -> Option<&str> {
-    let start = input.find('"')? + 1;
-    let end = input.rfind('"')?;
-    Some(&input[start..end])
 }

@@ -1,23 +1,26 @@
 use crate::{
+    app_state::AppState,
     models::users::{ResponseUser, User, UserRequest, UserSignOutRequest},
     queries::users_q::{create_user, get_user_by_username},
     utils::{
         errors::ApiError,
-        hash::{hash_password, verify_password}, jwt_auth_utils::create_token,
+        hash::{hash_password, verify_password},
+        jwt_auth_utils::create_token,
     },
 };
 use ::entity::users;
 use axum::debug_handler;
-use axum::{extract::State, http::StatusCode, Json};
 use axum::http::HeaderMap;
+use axum::{extract::State, http::StatusCode, Json};
+use bb8::Pool;
+use bb8_redis::RedisConnectionManager;
 use sea_orm::{DatabaseConnection, Set};
-use tower_sessions::Session;
 use uuid::Uuid;
 
-#[debug_handler]
+#[debug_handler(state = AppState)]
 pub async fn signup(
     State(db): State<DatabaseConnection>,
-    _session: Session,
+    State(_redis_pool): State<Pool<RedisConnectionManager>>,
     req_user: Json<User>,
 ) -> Result<(HeaderMap, Json<ResponseUser>), ApiError> {
     let new_user = users::ActiveModel {
@@ -25,8 +28,8 @@ pub async fn signup(
         user_name: Set(req_user.username.clone()),
         password: Set(hash_password(&req_user.password)?),
         email: Set(req_user.email.clone()),
-        steam_id : Set(req_user.steam_id.clone()),
-        psn_auth_code : Set(req_user.psn_auth_code.clone()),
+        steam_id: Set(req_user.steam_id.clone()),
+        psn_auth_code: Set(req_user.psn_auth_code.clone()),
         ..Default::default()
     };
 
@@ -53,7 +56,6 @@ pub async fn signup(
 #[debug_handler]
 pub async fn signin(
     State(db): State<DatabaseConnection>,
-    _session: Session,
     user_info: Json<UserRequest>,
 ) -> Result<(HeaderMap, Json<ResponseUser>), ApiError> {
     let user = get_user_by_username(&db, user_info.username.clone()).await?;
@@ -83,18 +85,9 @@ pub async fn signin(
 }
 
 #[debug_handler]
-pub async fn signout(
-    session: Session,
-    user_req: Json<UserSignOutRequest>,
-) -> Result<StatusCode, ApiError> {
-
+pub async fn signout(user_req: Json<UserSignOutRequest>) -> Result<StatusCode, ApiError> {
     let user_id = &user_req.user_id;
-    let session_key = format!("user_{}", &user_id);
-    let value: Option<usize> = session.remove(&session_key).unwrap_or_default();
+    let _session_key = format!("user_{}", &user_id);
 
-    match value {
-        Some(_) => Ok(StatusCode::INTERNAL_SERVER_ERROR),
-        None => Ok(StatusCode::OK)
-    }
-
+    Ok(StatusCode::OK)
 }

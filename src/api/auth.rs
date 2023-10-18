@@ -6,7 +6,7 @@ use crate::{
         errors::ApiError,
         hash::{hash_password, verify_password},
         jwt_auth_utils::create_token,
-        middware_utils::split_by_double_quotes,
+        middware_utils::{get_header, split_by_double_quotes},
     },
 };
 use ::entity::users;
@@ -45,6 +45,13 @@ pub async fn signup(
     let mut headers = HeaderMap::new();
     headers.insert("set-cookie", completed_token.parse().unwrap());
 
+    let mut conn = redis_pool.get().await.unwrap();
+    let _reply: redis::Value = cmd("SET")
+        .arg(&[token, user.clone().id])
+        .query_async(&mut *conn)
+        .await
+        .unwrap();
+
     let return_user = ResponseUser {
         id: user.clone().id,
         username: user.user_name,
@@ -52,15 +59,6 @@ pub async fn signup(
         steam_id: user.steam_id,
         psn_auth_code: user.psn_auth_code,
     };
-
-    let mut conn = redis_pool.get().await.unwrap();
-    let reply: redis::Value = cmd("SET")
-        .arg(&[token, user.id])
-        .query_async(&mut *conn)
-        .await
-        .unwrap();
-
-    eprintln!("SET result: {:?}", reply);
 
     Ok((headers, Json(return_user)))
 }
@@ -87,13 +85,11 @@ pub async fn signin(
     headers.insert("set-cookie", completed_token.parse().unwrap());
 
     let mut conn = redis_pool.get().await.unwrap();
-    let reply: redis::Value = cmd("SET")
+    let _reply: redis::Value = cmd("SET")
         .arg(&[token, user.clone().id])
         .query_async(&mut *conn)
         .await
         .unwrap();
-
-    eprintln!("SET result: {:?}", reply);
 
     let return_user = ResponseUser {
         id: user.id,
@@ -111,25 +107,13 @@ pub async fn signout(
     State(redis_pool): State<Pool<RedisConnectionManager>>,
     headers: HeaderMap,
 ) -> Result<StatusCode, ApiError> {
-    let header_token = if let Some(token) = headers.get(COOKIE) {
-        token.to_str().map_err(|error| {
-            eprintln!("Error extracting token from headers: {:?}", error);
-            ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error reading token")
-        })?
-    } else {
-        return Err(ApiError::new(
-            StatusCode::UNAUTHORIZED,
-            "not authenticated!",
-        ));
-    };
+    let header_token = get_header(headers, COOKIE.to_string())?;
 
-    let value = split_by_double_quotes(header_token.clone())
+    let value = split_by_double_quotes(header_token.as_str().clone())
         .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
-    eprintln!("token: {:?}", value.clone());
-    let mut conn = redis_pool.get().await.unwrap();
-    let reply: redis::Value = cmd("DEL").arg(value).query_async(&mut *conn).await.unwrap();
 
-    eprintln!("reply on signout: {:?}", reply);
+    let mut conn = redis_pool.get().await.unwrap();
+    let _reply: redis::Value = cmd("DEL").arg(value).query_async(&mut *conn).await.unwrap();
 
     Ok(StatusCode::OK)
 }

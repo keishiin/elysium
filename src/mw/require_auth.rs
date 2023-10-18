@@ -1,5 +1,7 @@
 use crate::utils::{
-    errors::ApiError, jwt_auth_utils::validate_token, middware_utils::split_by_double_quotes,
+    errors::ApiError,
+    jwt_auth_utils::validate_token,
+    middware_utils::{get_header, split_by_double_quotes},
 };
 use axum::{
     extract::State,
@@ -16,40 +18,14 @@ pub async fn require_auth<T>(
     request: Request<T>,
     next: Next<T>,
 ) -> Result<Response, ApiError> {
-    let header_token = if let Some(token) = headers.get(COOKIE) {
-        token.to_str().map_err(|error| {
-            eprintln!("Error extracting token from headers: {:?}", error);
-            ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error reading token")
-        })?
-    } else {
-        return Err(ApiError::new(
-            StatusCode::UNAUTHORIZED,
-            "Cookie is missing!",
-        ));
-    };
+    let header_token = get_header(headers.clone(), COOKIE.to_string())?;
+    let header_user_token = get_header(headers, "axum-accountId".to_string())?;
 
-    let header_user_token = if let Some(user_token) = headers.get("axum-accountId") {
-        user_token.to_str().map_err(|error| {
-            eprintln!("Error extracting user token from headers: {:?}", error);
-            ApiError::new(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error user reading token",
-            )
-        })?
-    } else {
-        return Err(ApiError::new(
-            StatusCode::UNAUTHORIZED,
-            "axum-accountId is missing!",
-        ));
-    };
-
-    let value = split_by_double_quotes(header_token.clone())
+    let value = split_by_double_quotes(header_token.as_str())
         .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
-    eprintln!("cookie value: {:?}", header_token);
 
-    let user_id = split_by_double_quotes(header_user_token)
+    let user_id = split_by_double_quotes(header_user_token.as_str())
         .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
-    eprintln!("account id: {:?}", user_id.clone());
 
     validate_token(value.clone())?;
 
@@ -60,7 +36,6 @@ pub async fn require_auth<T>(
         return Err(ApiError::new(StatusCode::UNAUTHORIZED, "reply was nil"));
     } else if let redis::Value::Data(data) = reply {
         let reply_str = std::str::from_utf8(&data).unwrap(); // Convert the reply to a string
-        eprintln!("reply_str was: {:?}", reply_str);
         if reply_str == user_id {
             Ok(next.run(request).await)
         } else {

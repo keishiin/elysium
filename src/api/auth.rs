@@ -6,6 +6,7 @@ use crate::{
         errors::ApiError,
         hash::{hash_password, verify_password},
         jwt_auth_utils::create_token,
+        middware_utils::split_by_double_quotes,
     },
 };
 use ::entity::users;
@@ -14,6 +15,7 @@ use axum::http::HeaderMap;
 use axum::{extract::State, http::StatusCode, Json};
 use bb8::Pool;
 use bb8_redis::RedisConnectionManager;
+use hyper::header::COOKIE;
 use redis::cmd;
 use sea_orm::{DatabaseConnection, Set};
 use uuid::Uuid;
@@ -104,10 +106,34 @@ pub async fn signin(
     Ok((headers, Json(return_user)))
 }
 
-#[debug_handler]
-pub async fn signout(user_req: Json<UserSignOutRequest>) -> Result<StatusCode, ApiError> {
+#[debug_handler(state = AppState)]
+pub async fn signout(
+    State(redis_pool): State<Pool<RedisConnectionManager>>,
+    headers: HeaderMap,
+    user_req: Json<UserSignOutRequest>,
+) -> Result<StatusCode, ApiError> {
     let user_id = &user_req.user_id;
     let _session_key = format!("user_{}", &user_id);
+
+    let header_token = if let Some(token) = headers.get(COOKIE) {
+        token.to_str().map_err(|error| {
+            eprintln!("Error extracting token from headers: {:?}", error);
+            ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Error reading token")
+        })?
+    } else {
+        return Err(ApiError::new(
+            StatusCode::UNAUTHORIZED,
+            "not authenticated!",
+        ));
+    };
+
+    let value = split_by_double_quotes(header_token.clone())
+        .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
+    eprintln!("token: {:?}", value.clone());
+    let mut conn = redis_pool.get().await.unwrap();
+    let reply: redis::Value = cmd("DEL").arg(value).query_async(&mut *conn).await.unwrap();
+
+    eprintln!("reply on signout: {:?}", reply);
 
     Ok(StatusCode::OK)
 }

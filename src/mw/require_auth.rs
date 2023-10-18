@@ -39,19 +39,6 @@ pub async fn require_auth<T>(
     eprintln!("Redis connection response was: {:?}", reply);
     let user_id = "3cf620ec-6ee9-4f91-861a-8fbc15e3361f";
 
-    // if reply == redis::Value::Nil {
-    //     return Err(ApiError::new(
-    //         StatusCode::UNAUTHORIZED,
-    //         "Your are not authenticated. Please signin",
-    //     ));
-    // } else if user_id.to_string() != reply {
-    //     return Err(ApiError::new(
-    //         StatusCode::UNAUTHORIZED,
-    //         "Your are not authenticated. Please signin",
-    //     ));
-    // } else {
-    //     Ok(next.run(request).await)
-    // }
     if reply == redis::Value::Nil {
         return Err(ApiError::new(StatusCode::UNAUTHORIZED, "reply was nil"));
     } else if let redis::Value::Data(data) = reply {

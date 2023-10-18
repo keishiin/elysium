@@ -28,16 +28,45 @@ pub async fn require_auth<T>(
         ));
     };
 
-    let value = split_by_double_quotes(header_token)
+    let value = split_by_double_quotes(header_token.clone())
         .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
 
-    validate_token(value)?;
+    validate_token(value.clone())?;
 
     let mut conn = redis_pool.get().await.unwrap();
-    let reply: String = cmd("PONG").query_async(&mut *conn).await.unwrap();
+    let reply: redis::Value = cmd("GET").arg(value).query_async(&mut *conn).await.unwrap();
 
-    eprintln!("Redis connection PING response: {:?}", reply);
+    eprintln!("Redis connection response was: {:?}", reply);
+    let user_id = "3cf620ec-6ee9-4f91-861a-8fbc15e3361f";
 
-    Ok(next.run(request).await)
+    // if reply == redis::Value::Nil {
+    //     return Err(ApiError::new(
+    //         StatusCode::UNAUTHORIZED,
+    //         "Your are not authenticated. Please signin",
+    //     ));
+    // } else if user_id.to_string() != reply {
+    //     return Err(ApiError::new(
+    //         StatusCode::UNAUTHORIZED,
+    //         "Your are not authenticated. Please signin",
+    //     ));
+    // } else {
+    //     Ok(next.run(request).await)
+    // }
+    if reply == redis::Value::Nil {
+        return Err(ApiError::new(StatusCode::UNAUTHORIZED, "reply was nil"));
+    } else if let redis::Value::Data(data) = reply {
+        let reply_str = std::str::from_utf8(&data).unwrap(); // Convert the reply to a string
+        eprintln!("reply_str was: {:?}", reply_str);
+        if reply_str == user_id {
+            Ok(next.run(request).await)
+        } else {
+            return Err(ApiError::new(
+                StatusCode::UNAUTHORIZED,
+                "first outer for stuff",
+            ));
+        }
+    } else {
+        // this should never be able to make it here hopefully
+        unreachable!()
+    }
 }
-

@@ -14,13 +14,14 @@ use axum::http::HeaderMap;
 use axum::{extract::State, http::StatusCode, Json};
 use bb8::Pool;
 use bb8_redis::RedisConnectionManager;
+use redis::cmd;
 use sea_orm::{DatabaseConnection, Set};
 use uuid::Uuid;
 
 #[debug_handler(state = AppState)]
 pub async fn signup(
     State(db): State<DatabaseConnection>,
-    State(_redis_pool): State<Pool<RedisConnectionManager>>,
+    State(redis_pool): State<Pool<RedisConnectionManager>>,
     req_user: Json<User>,
 ) -> Result<(HeaderMap, Json<ResponseUser>), ApiError> {
     let new_user = users::ActiveModel {
@@ -37,25 +38,35 @@ pub async fn signup(
     let session_key = format!("user_{}", user.id);
 
     let token = create_token(session_key)?;
-    let completed_token = format!("s.id={:?}", token);
+    let completed_token = format!("s.id={:?}", token.clone());
 
     let mut headers = HeaderMap::new();
     headers.insert("set-cookie", completed_token.parse().unwrap());
 
     let return_user = ResponseUser {
-        id: user.id,
+        id: user.clone().id,
         username: user.user_name,
         email: user.email,
         steam_id: user.steam_id,
         psn_auth_code: user.psn_auth_code,
     };
 
+    let mut conn = redis_pool.get().await.unwrap();
+    let reply: redis::Value = cmd("SET")
+        .arg(&[token, user.id])
+        .query_async(&mut *conn)
+        .await
+        .unwrap();
+
+    eprintln!("SET result: {:?}", reply);
+
     Ok((headers, Json(return_user)))
 }
 
-#[debug_handler]
+#[debug_handler(state = AppState)]
 pub async fn signin(
     State(db): State<DatabaseConnection>,
+    State(redis_pool): State<Pool<RedisConnectionManager>>,
     user_info: Json<UserRequest>,
 ) -> Result<(HeaderMap, Json<ResponseUser>), ApiError> {
     let user = get_user_by_username(&db, user_info.username.clone()).await?;
@@ -68,10 +79,19 @@ pub async fn signin(
     }
     let session_key = format!("user_{}", user.id);
     let token = create_token(session_key)?;
-    let completed_token = format!("s.id={:?}", token);
+    let completed_token = format!("s.id={:?}", token.clone());
 
     let mut headers = HeaderMap::new();
     headers.insert("set-cookie", completed_token.parse().unwrap());
+
+    let mut conn = redis_pool.get().await.unwrap();
+    let reply: redis::Value = cmd("SET")
+        .arg(&[token, user.clone().id])
+        .query_async(&mut *conn)
+        .await
+        .unwrap();
+
+    eprintln!("SET result: {:?}", reply);
 
     let return_user = ResponseUser {
         id: user.id,

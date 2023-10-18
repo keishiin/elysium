@@ -45,3 +45,9 @@ pub struct UserSignOutRequest {
     pub user_id: String,
     pub password: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct UserRequestsWithAuth {
+    pub user_id: String,
+    pub password: String,
+}

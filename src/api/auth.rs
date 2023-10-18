@@ -1,6 +1,6 @@
 use crate::{
     app_state::AppState,
-    models::users::{ResponseUser, User, UserRequest, UserSignOutRequest},
+    models::users::{ResponseUser, User, UserRequest},
     queries::users_q::{create_user, get_user_by_username},
     utils::{
         errors::ApiError,
@@ -110,11 +110,7 @@ pub async fn signin(
 pub async fn signout(
     State(redis_pool): State<Pool<RedisConnectionManager>>,
     headers: HeaderMap,
-    user_req: Json<UserSignOutRequest>,
 ) -> Result<StatusCode, ApiError> {
-    let user_id = &user_req.user_id;
-    let _session_key = format!("user_{}", &user_id);
-
     let header_token = if let Some(token) = headers.get(COOKIE) {
         token.to_str().map_err(|error| {
             eprintln!("Error extracting token from headers: {:?}", error);

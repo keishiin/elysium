@@ -29,25 +29,9 @@ pub struct UserRequest {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct UserUpdateIdRequest {
-    pub steam_id: String,
-    pub user_id: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct UserUpdatePsnCodeRequest {
-    pub psn_code: String,
-    pub user_id: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct UserSignOutRequest {
-    pub user_id: String,
-    pub password: String,
-}
-
-#[derive(Serialize, Deserialize)]
 pub struct UserRequestsWithAuth {
     pub user_id: String,
-    pub password: String,
+    pub username: String,
+    pub steam_id: Option<String>,
+    pub psn_code: Option<String>,
 }

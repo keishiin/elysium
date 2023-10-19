@@ -1,6 +1,5 @@
 /backend/target
 .env
 /backend/migration/target
-postgres.yaml
 .vscode/settings.json
 temp.txt

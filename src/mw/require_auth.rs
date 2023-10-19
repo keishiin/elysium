@@ -21,13 +21,10 @@ pub async fn require_auth<T>(
     let header_token = get_header(headers.clone(), COOKIE.to_string())?;
     let header_user_token = get_header(headers, "axum-accountId".to_string())?;
 
-    let value = split_by_double_quotes(header_token.as_str())
-        .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
+    let value = split_by_double_quotes(header_token.as_str())?;
+    let user_id = split_by_double_quotes(header_user_token.as_str())?;
 
-    let user_id = split_by_double_quotes(header_user_token.as_str())
-        .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
-
-    validate_token(value.clone())?;
+    validate_token(&value.clone())?;
 
     let mut conn = redis_pool.get().await.unwrap();
     let reply: redis::Value = cmd("GET").arg(value).query_async(&mut *conn).await.unwrap();

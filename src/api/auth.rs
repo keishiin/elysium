@@ -109,8 +109,7 @@ pub async fn signout(
 ) -> Result<StatusCode, ApiError> {
     let header_token = get_header(headers, COOKIE.to_string())?;
 
-    let value = split_by_double_quotes(header_token.as_str().clone())
-        .ok_or_else(|| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "Invalid token format"))?;
+    let value = split_by_double_quotes(header_token.as_str().clone())?;
 
     let mut conn = redis_pool.get().await.unwrap();
     let _reply: redis::Value = cmd("DEL").arg(value).query_async(&mut *conn).await.unwrap();

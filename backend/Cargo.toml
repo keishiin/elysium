@@ -17,8 +17,8 @@ bcrypt = "0.15.0"
 bb8-redis = "0.13.1"
 env_logger = "0.10"
 jsonwebtoken = "9.0.0"
-entity = { path = "../webapp/entity" }
-migration = { path = "../webapp/migration" }
+entity = { path = "../backend/entity" }
+migration = { path = "../backend/migration" }
 hyper = { version = "0.14", features = ["full"] }
 tokio = { version = "1.0", features = ["full"] }
 serde = { version = "1", features = ["derive"] }

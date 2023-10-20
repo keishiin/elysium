@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::errors::ApiError;
 
-
 #[derive(Serialize, Deserialize)]
 struct Claims {
     exp: usize,
@@ -34,7 +33,6 @@ pub fn create_token(username: String) -> Result<String, ApiError> {
 pub fn validate_token(token: &str) -> Result<bool, ApiError> {
     let key = DecodingKey::from_secret("secretkey".as_bytes());
     let validation = Validation::new(jsonwebtoken::Algorithm::HS256);
-    eprintln!("Header_token: {:?}", token);
     decode::<Claims>(token, &key, &validation)
         .map_err(|error| match error.kind() {
             jsonwebtoken::errors::ErrorKind::InvalidToken
@@ -49,3 +47,4 @@ pub fn validate_token(token: &str) -> Result<bool, ApiError> {
         })
         .map(|_claim| true)
 }
+

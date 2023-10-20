@@ -11,6 +11,9 @@ async fn main() {
     let redis_url = std::env::var("REDIS_URL").expect("No host set for redis");
     let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+    eprintln!("db url: {:?}", db_url);
+    eprintln!("redis url: {:?}", redis_url);
+
     let db = match Database::connect(db_url).await {
         Ok(db) => db,
         Err(error) => {

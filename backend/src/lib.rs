@@ -24,7 +24,7 @@ pub async fn run(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
 
     let router = create_router(state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     tracing::debug!("listening on {}", addr);
 
     axum::Server::bind(&addr)

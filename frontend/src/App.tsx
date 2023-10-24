@@ -1,9 +1,9 @@
-import Header from "./components/Header.tsx"
+import Navbar from "./components/Navbar.tsx"
 
 function App() {
 
   return (
-    <Header/>
+    <Navbar />
   )
 }
 

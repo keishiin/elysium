@@ -1,5 +1,5 @@
 /backend/target
-.env
 /backend/migration/target
+/backend/entity/target
 .vscode/settings.json
-temp.txt
+.env

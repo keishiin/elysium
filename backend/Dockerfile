@@ -4,7 +4,7 @@ FROM rust:1.72
 # set the working dir
 WORKDIR /backend
 
-COPY ./backend .
+COPY . .
 
 RUN cargo build --release
 

@@ -1,60 +1,107 @@
-function Header() {
-  return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href="#" className="flex items-center">
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            webapp
-          </span>
-        </a>
-        <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
-          <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-            <li>
-              <a href="#" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700" >
-                Psn
-              </a>
-            </li>
-            <li>
-              <a href="#" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                Steam
-              </a>
-            </li>
-            <li>
-              <a href="#" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                Services
-              </a>
-            </li>
-            <li>
-              <a href="#" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-                Contact
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
-          <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-            <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-              <a>
-                Login
-              </a>
-            </button>
-            <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-              <a>
-                Sign Up
-              </a>
-            </button>
-            <button data-collapse-toggle="navbar-cta" type="button" className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-cta" aria-expanded="false">
-              <span className="sr-only">Open main menu</span>
-              <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
-              </svg>
-            </button>
-          </ul>
-        </div>
-
-      </div>
-    </nav>
-  )
+function Navbar() {
+	return (
+		<div className="bg-blue-500">
+			<nav className="relative py-2 pl-3 pr-4 flex justify-between items-center bg-white">
+				<a className="text-3xl font-bold leading-none" href="#">
+					<span className="h-10">
+						webapp
+					</span>
+				</a>
+				<div className="lg:hidden">
+					<button className="navbar-burger flex items-center text-blue-600 p-3">
+						<svg className="block h-4 w-4 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+							<title>Mobile menu</title>
+							<path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
+						</svg>
+					</button>
+				</div>
+				<ul className="hidden absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto lg:flex lg:items-center lg:w-auto lg:space-x-6">
+					<li>
+						<a className="py-2 pl-3 pr-4 text-black hover:text-blue-500" href="#">
+							Home
+						</a>
+					</li>
+					<li>
+						<a className="py-2 pl-3 pr-4 text-black hover:text-gray-500" href="#">
+							About Us
+						</a>
+					</li>
+					<li>
+						<a className="py-2 pl-3 pr-4 text-black hover:text-gray-500" href="#">
+							Services
+						</a>
+					</li>
+					<li>
+						<a className="py-2 pl-3 pr-4 text-black hover:text-gray-500" href="#">
+							Pricing
+						</a>
+					</li>
+					<li>
+						<a className="py-2 pl-3 pr-4 text-black hover:text-gray-500" href="#">
+							Contact
+						</a>
+					</li>
+				</ul>
+				<a className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold  rounded-xl transition duration-200" href="#">
+					Sign In
+				</a>
+				<a className="hidden lg:inline-block py-2 px-6 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200" href="#">
+					Sign up
+				</a>
+			</nav>
+			<div className="navbar-menu relative z-50 hidden">
+				<div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
+				<nav className="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-white border-r overflow-y-auto">
+					<div className="flex items-center mb-8">
+						<button className="navbar-close">
+							<svg className="h-6 w-6 text-gray-400 cursor-pointer hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+							</svg>
+						</button>
+					</div>
+					<div>
+						<ul>
+							<li className="mb-1">
+								<a className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded" href="#">
+									Home
+								</a>
+							</li>
+							<li className="mb-1">
+								<a className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded" href="#">
+									About Us
+								</a>
+							</li>
+							<li className="mb-1">
+								<a className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded" href="#">
+									Services
+								</a>
+							</li>
+							<li className="mb-1">
+								<a className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded" href="#">
+									Pricing
+								</a>
+							</li>
+							<li className="mb-1">
+								<a className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded" href="#">
+									Contact
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div className="mt-auto">
+						<div className="pt-6">
+							<a className="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold leading-none bg-gray-50 hover:bg-gray-100 rounded-xl" href="#">
+								Sign in
+							</a>
+							<a className="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl" href="#">
+								Sign Up
+							</a>
+						</div>
+					</div>
+				</nav>
+			</div>
+		</div>
+	)
 }
 
-export default Header; 
+export default Navbar; 

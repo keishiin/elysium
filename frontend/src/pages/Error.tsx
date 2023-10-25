@@ -1,7 +1,7 @@
 import { useRouteError } from "react-router-dom";
 
 function ErrorPage() {
-  const error: unknown = useRouteError()
+  const error: unknown = useRouteError();
 
   return (
     <div>
@@ -14,7 +14,7 @@ function ErrorPage() {
         </i>
       </p>
     </div>
-  )
+  );
 }
 
 export default ErrorPage;

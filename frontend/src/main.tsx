@@ -6,6 +6,8 @@ import Home from "./pages/Home.tsx";
 import SignIn from "./pages/SignIn.tsx";
 import SignUp from "./pages/SignUp.tsx";
 import ErrorPage from "./pages/Error.tsx";
+import UserProfile from "./pages/UserProfile.tsx";
+import Trophies from "./pages/Trophies.tsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,22 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignUp />,
+  },
+  {
+    path: "userProfile",
+    element: <UserProfile />,
+  },
+  {
+    path: "/psn",
+    element: <Trophies platform="psn" />,
+  },
+  {
+    path: "/xbox",
+    element: <Trophies platform="xbox" />,
+  },
+  {
+    path: "/steam",
+    element: <Trophies platform="steam" />,
   },
 ]);
 

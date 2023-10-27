@@ -23,11 +23,9 @@ function SignUp() {
 
   return (
     <div className="bg-gray-100 flex justify-center items-center h-screen">
-      {/* Right: Sign up Form  */}
       <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
         <h1 className="text-2xl font-semibold mb-4">Sign Up</h1>
         <form onSubmit={handleSubmit}>
-          {/* <!-- Username Input --> */}
           <div className="mb-4">
             <label className="block text-gray-600">Username</label>
             <input
@@ -68,7 +66,6 @@ function SignUp() {
               onChange={(event) => setPasswordCheck(event.target.value)}
             ></input>
           </div>
-          {/* <!-- Sign Up Button --> */}
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
@@ -76,14 +73,17 @@ function SignUp() {
             Sign Up
           </button>
         </form>
-        {/* <!-- Sign up  Link --> */}
         <div className="mt-6 text-blue-500 text-center">
           <Link to="/login" className="hover:underline">
             Login
           </Link>
         </div>
+        <div className="mt-6 text-blue-500 text-center">
+          <Link to="/" className="hover:underline">
+            Home
+          </Link>
+        </div>
       </div>
-      {/* <!-- Right: Image --> */}
       <div className="w-1/2 h-screen hidden lg:block">
         <img
           src="../../images/photo-1698207873249-640dab81d84e.jpg"

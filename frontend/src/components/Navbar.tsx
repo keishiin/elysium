@@ -1,10 +1,12 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
 	return (
 		<div className="bg-blue-500">
 			<nav className="relative py-2 pl-3 pr-4 flex justify-between items-center bg-white">
-				<a className="text-3xl font-bold leading-none" href="#">
+				<Link to="/" className="text-3xl font-bold leading-none">
 					<span className="h-10">webapp</span>
-				</a>
+				</Link>
 				<div className="lg:hidden">
 					<button className="navbar-burger flex items-center text-blue-600 p-3">
 						<svg
@@ -19,58 +21,58 @@ function Navbar() {
 				</div>
 				<ul className="hidden absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto lg:flex lg:items-center lg:w-auto lg:space-x-6">
 					<li>
-						<a
+						<Link
+							to="/"
 							className="py-2 pl-3 pr-4 text-black hover:text-blue-500"
-							href="#"
 						>
 							Home
-						</a>
+						</Link>
 					</li>
 					<li>
-						<a
+						<Link
+							to="/userProfile"
 							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
-							href="#"
 						>
-							About Us
-						</a>
+							Profile
+						</Link>
 					</li>
 					<li>
-						<a
+						<Link
+							to="/psn"
 							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
-							href="#"
 						>
-							Services
-						</a>
+							Psn
+						</Link>
 					</li>
 					<li>
-						<a
+						<Link
+							to="/xbox"
 							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
-							href="#"
 						>
-							Pricing
-						</a>
+							Xbox
+						</Link>
 					</li>
 					<li>
-						<a
+						<Link
+							to="/steam"
 							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
-							href="#"
 						>
-							Contact
-						</a>
+							Steam
+						</Link>
 					</li>
 				</ul>
-				<a
+				<Link
+					to="/login"
 					className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold  rounded-xl transition duration-200"
-					href="#"
 				>
 					Sign In
-				</a>
-				<a
+				</Link>
+				<Link
+					to="/signup"
 					className="hidden lg:inline-block py-2 px-6 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200"
-					href="#"
 				>
 					Sign up
-				</a>
+				</Link>
 			</nav>
 			<div className="navbar-menu relative z-50 hidden">
 				<div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
@@ -96,61 +98,61 @@ function Navbar() {
 					<div>
 						<ul>
 							<li className="mb-1">
-								<a
+								<Link
+									to="/"
 									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
-									href="#"
 								>
 									Home
-								</a>
+								</Link>
 							</li>
 							<li className="mb-1">
-								<a
+								<Link
+									to="/userProfile"
 									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
-									href="#"
 								>
-									About Us
-								</a>
+									Profile
+								</Link>
 							</li>
 							<li className="mb-1">
-								<a
+								<Link
+									to="/psn"
 									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
-									href="#"
 								>
-									Services
-								</a>
+									Psn
+								</Link>
 							</li>
 							<li className="mb-1">
-								<a
+								<Link
+									to="/xbox"
 									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
-									href="#"
 								>
-									Pricing
-								</a>
+									Xbox
+								</Link>
 							</li>
 							<li className="mb-1">
-								<a
+								<Link
+									to="/steam"
 									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
-									href="#"
 								>
-									Contact
-								</a>
+									Steam
+								</Link>
 							</li>
 						</ul>
 					</div>
 					<div className="mt-auto">
 						<div className="pt-6">
-							<a
+							<Link
+								to="/login"
 								className="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold leading-none bg-gray-50 hover:bg-gray-100 rounded-xl"
-								href="#"
 							>
 								Sign in
-							</a>
-							<a
+							</Link>
+							<Link
+								to="/signup"
 								className="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
-								href="#"
 							>
 								Sign Up
-							</a>
+							</Link>
 						</div>
 					</div>
 				</nav>

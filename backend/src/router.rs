@@ -12,9 +12,17 @@ use axum::{
     routing::{get, post, put},
     Router,
 };
-use tower_http::trace::TraceLayer;
+use hyper::{Method, header::{AUTHORIZATION, CONTENT_TYPE}};
+use tower_http::{
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
 
 pub fn create_router(state: AppState) -> Router {
+    let cors: CorsLayer = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST, Method::PUT])
+        .allow_origin(Any)
+        .allow_headers([AUTHORIZATION, CONTENT_TYPE]);
     Router::new()
         .route("/", get(root))
         .route("/users", get(get_user))
@@ -29,4 +37,5 @@ pub fn create_router(state: AppState) -> Router {
         .fallback(fallback)
         .with_state(state)
         .layer(TraceLayer::new_for_http())
+        .layer(cors)
 }

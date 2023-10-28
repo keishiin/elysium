@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -27,11 +27,21 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports: 
+    ports:
       - "8080:8080"
     depends_on:
       - db
       - redis
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres-data:

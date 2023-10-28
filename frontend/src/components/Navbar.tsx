@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
+	const [isOpen, setIsOpen] = useState(false);
+
 	return (
 		<div className="bg-blue-500">
 			<nav className="relative py-2 pl-3 pr-4 flex justify-between items-center bg-white">
@@ -10,6 +13,7 @@ function Navbar() {
 				<div className="lg:hidden">
 					<button className="navbar-burger flex items-center text-blue-600 p-3">
 						<svg
+							onClick={() => setIsOpen(!isOpen)}
 							className="block h-4 w-4 fill-current"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
@@ -74,12 +78,19 @@ function Navbar() {
 					Sign up
 				</Link>
 			</nav>
-			<div className="navbar-menu relative z-50 hidden">
+			<div
+				className={
+					!isOpen
+						? "navbar-menu relative z-50 hidden"
+						: "navbar-menu relative z-50 block"
+				}
+			>
 				<div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
 				<nav className="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-white border-r overflow-y-auto">
 					<div className="flex items-center mb-8">
 						<button className="navbar-close">
 							<svg
+								onClick={() => setIsOpen(!isOpen)}
 								className="h-6 w-6 text-gray-400 cursor-pointer hover:text-gray-500"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"

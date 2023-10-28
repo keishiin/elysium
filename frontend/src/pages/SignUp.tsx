@@ -1,18 +1,71 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "react-query";
+import axios from "axios";
 
 function SignUp() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [email, setEmail] = useState("");
+  const nav = useNavigate();
+
+  const { isLoading: isPostingUser, mutate: postUser } = useMutation(
+    async () => {
+      return await axios.post(
+        "http://127.0.0.1:8080/auth/signup",
+        {
+          username: username,
+          password: password,
+          email: email,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    },
+    {
+      onSuccess: (res) => {
+        if (localStorage.getItem("user") != null) {
+          localStorage.removeItem("user");
+        }
+        localStorage.setItem("user", JSON.stringify(res.data));
+        console.log("this is the response data", res.data);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    },
+  );
+
+  useEffect(() => {
+    if (isPostingUser) {
+      console.log(isPostingUser);
+    }
+  }, [isPostingUser]);
 
   const handleSubmit = (event: any) => {
-    console.log("username => ", username);
-    console.log("password => ", password);
-    console.log("passwordCheck => ", passwordCheck);
-    console.log("email => ", email);
+    event.preventDefault();
 
+    if (password !== passwordCheck) {
+      console.log("passwords dont match");
+      cleanUp(event);
+      return;
+    }
+
+    try {
+      postUser();
+      cleanUp(event);
+      nav("/userProfile");
+    } catch (err) {
+      cleanUp(event);
+      console.log(err);
+    }
+  };
+
+  const cleanUp = (event: any) => {
     event.target.reset();
 
     setUserName("");

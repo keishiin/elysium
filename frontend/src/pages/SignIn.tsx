@@ -1,16 +1,63 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useMutation } from "react-query";
+import axios from "axios";
 
 function SignIn() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const nav = useNavigate();
 
-  const handleSubmit = (event: any) => {
-    console.log(username);
-    console.log(password);
+  const { isLoading: isPostingUser, mutate: postUser } = useMutation(
+    async () => {
+      return await axios.post(
+        "http://127.0.0.1:8080/auth/signin",
+        {
+          username: username,
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    },
+    {
+      onSuccess: (res) => {
+        if (localStorage.getItem("user") != null) {
+          localStorage.removeItem("user");
+        }
+        localStorage.setItem("user", JSON.stringify(res.data));
+        console.log("this is the response data", res.data);
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    },
+  );
 
+  useEffect(() => {
+    if (isPostingUser) {
+      console.log(isPostingUser);
+    }
+  }, [isPostingUser]);
+
+  const postData = (event: any) => {
+    event.preventDefault();
+
+    try {
+      postUser();
+      cleanUp(event);
+      nav("/userProfile");
+    } catch (err) {
+      cleanUp(event);
+      console.log("error");
+    }
+  };
+
+  const cleanUp = (event: any) => {
     event.target.reset();
-
     setUserName("");
     setPassword("");
   };
@@ -26,7 +73,7 @@ function SignIn() {
       </div>
       <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
         <h1 className="text-2xl font-semibold mb-4">Login</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={postData}>
           <div className="mb-4">
             <label className="block text-gray-600">Username</label>
             <input

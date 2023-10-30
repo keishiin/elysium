@@ -12,17 +12,23 @@ use axum::{
     routing::{get, post, put},
     Router,
 };
-use hyper::{Method, header::{AUTHORIZATION, CONTENT_TYPE}};
+use hyper::{
+    header::{AUTHORIZATION, CONTENT_TYPE},
+    Method,
+};
 use tower_http::{
-    cors::{Any, CorsLayer},
+    cors::CorsLayer,
     trace::TraceLayer,
 };
 
 pub fn create_router(state: AppState) -> Router {
     let cors: CorsLayer = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PUT])
-        .allow_origin(Any)
-        .allow_headers([AUTHORIZATION, CONTENT_TYPE]);
+        .allow_origin(["http://localhost:5173".parse().unwrap()])
+        .allow_headers([AUTHORIZATION, CONTENT_TYPE])
+        .expose_headers(["set-cookie".parse().unwrap()])
+        .allow_credentials(true);
+
     Router::new()
         .route("/", get(root))
         .route("/users", get(get_user))

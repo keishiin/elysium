@@ -10,7 +10,8 @@ interface SignInResponse {
 }
 
 function UserProfile() {
-    const [resp, setData] = useState<SignInResponse | undefined>(undefined);
+    const [data, setData] = useState<SignInResponse | undefined>(undefined);
+    const emptyId = "Null";
     const nav = useNavigate();
 
     useEffect(() => {
@@ -28,7 +29,6 @@ function UserProfile() {
         if (localStorage.getItem("user") != null) {
             localStorage.removeItem("user");
         }
-
         nav("/");
     };
 
@@ -45,7 +45,7 @@ function UserProfile() {
                     </div>
                     <div className="p-2">
                         <h3 className="text-center text-xl text-gray-900 font-medium leading-8">
-                            {resp?.username}
+                            {data?.username !== null ? data?.username : emptyId}
                         </h3>
                         <table className="text-xs my-3">
                             <tbody>
@@ -53,19 +53,27 @@ function UserProfile() {
                                     <td className="px-2 py-2 text-gray-500 font-semibold">
                                         Email
                                     </td>
-                                    <td className="px-2 py-2">{resp?.email}</td>
+                                    <td className="px-2 py-2">
+                                        {data?.email !== null ? data?.email : emptyId}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className="px-2 py-2 text-gray-500 font-semibold">
                                         SteamId
                                     </td>
-                                    <td className="px-2 py-2">{resp?.steam_id}</td>
+                                    <td className="px-2 py-2">
+                                        {data?.steam_id !== null ? data?.steam_id : emptyId}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className="px-2 py-2 text-gray-500 font-semibold">
                                         PsnId
                                     </td>
-                                    <td className="px-2 py-2">{resp?.psn_auth_code}</td>
+                                    <td className="px-2 py-2">
+                                        {data?.psn_auth_code !== null
+                                            ? data?.psn_auth_code
+                                            : emptyId}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className="px-2 py-2 text-gray-500 font-semibold">

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
-import axios from "axios";
+import apiClient from "../services/api-common";
 
 function SignIn() {
   const [username, setUserName] = useState("");
@@ -10,18 +10,10 @@ function SignIn() {
 
   const { isLoading: isPostingUser, mutate: postUser } = useMutation(
     async () => {
-      return await axios.post(
-        "http://127.0.0.1:8080/auth/signin",
-        {
-          username: username,
-          password: password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      return await apiClient.post("auth/signin", {
+        username: username,
+        password: password,
+      });
     },
     {
       onSuccess: (res) => {
@@ -29,7 +21,7 @@ function SignIn() {
           localStorage.removeItem("user");
         }
         localStorage.setItem("user", JSON.stringify(res.data));
-        console.log("this is the response data", res.data);
+        console.log("headers => ", res.headers["set-cookie"]);
       },
       onError: (err) => {
         console.log(err);
@@ -48,7 +40,6 @@ function SignIn() {
 
     try {
       postUser();
-      cleanUp(event);
       nav("/userProfile");
     } catch (err) {
       cleanUp(event);

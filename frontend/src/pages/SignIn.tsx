@@ -21,7 +21,6 @@ function SignIn() {
           localStorage.removeItem("user");
         }
         localStorage.setItem("user", JSON.stringify(res.data));
-        console.log("headers => ", res.headers["set-cookie"]);
       },
       onError: (err) => {
         console.log(err);

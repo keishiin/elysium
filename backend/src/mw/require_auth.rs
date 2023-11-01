@@ -1,7 +1,7 @@
 use crate::utils::{
     errors::ApiError,
     jwt_auth_utils::validate_token,
-    middware_utils::{get_header, split_by_double_quotes},
+    middware_utils::get_header,
 };
 use axum::{
     extract::State,
@@ -10,7 +10,7 @@ use axum::{
     response::Response,
 };
 use bb8_redis::{bb8::Pool, redis::cmd, RedisConnectionManager};
-use hyper::{header::COOKIE, StatusCode};
+use hyper::StatusCode;
 
 pub async fn require_auth<T>(
     State(redis_pool): State<Pool<RedisConnectionManager>>,
@@ -18,22 +18,21 @@ pub async fn require_auth<T>(
     request: Request<T>,
     next: Next<T>,
 ) -> Result<Response, ApiError> {
-    let header_token = get_header(headers.clone(), COOKIE.to_string())?;
+    let header_token = get_header(headers.clone(), "Authorization".to_string())?;
     let header_user_token = get_header(headers, "axum-accountId".to_string())?;
 
-    let value = split_by_double_quotes(header_token.as_str())?;
-    let user_id = split_by_double_quotes(header_user_token.as_str())?;
+    eprintln!("auth_header: {:?}", header_token.clone());
 
-    validate_token(&value.clone())?;
+    validate_token(&&header_token.clone())?;
 
     let mut conn = redis_pool.get().await.unwrap();
-    let reply: redis::Value = cmd("GET").arg(value).query_async(&mut *conn).await.unwrap();
+    let reply: redis::Value = cmd("GET").arg(header_token).query_async(&mut *conn).await.unwrap();
 
     if reply == redis::Value::Nil {
         return Err(ApiError::new(StatusCode::UNAUTHORIZED, "reply was nil"));
     } else if let redis::Value::Data(data) = reply {
-        let reply_str = std::str::from_utf8(&data).unwrap(); // Convert the reply to a string
-        if reply_str == user_id {
+        let reply_str = std::str::from_utf8(&data).unwrap();
+        if reply_str == header_user_token {
             Ok(next.run(request).await)
         } else {
             return Err(ApiError::new(

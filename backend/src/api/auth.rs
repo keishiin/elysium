@@ -43,7 +43,7 @@ pub async fn signup(
     let completed_token = format!("s.id={:?}", token.clone());
 
     let mut headers = HeaderMap::new();
-    headers.insert("set-cookie", completed_token.parse().unwrap());
+    headers.insert("Authorization", completed_token.parse().unwrap());
 
     let mut conn = redis_pool.get().await.unwrap();
     let _reply: redis::Value = cmd("SET")
@@ -79,10 +79,10 @@ pub async fn signin(
     }
     let session_key = format!("user_{}", user.id);
     let token = create_token(session_key)?;
-    let completed_token = format!("s.id={:?}", token.clone());
+    // let completed_token = format!("s.id={:?}; SameSite=None;", token.clone());
 
     let mut headers = HeaderMap::new();
-    headers.insert("set-cookie", completed_token.parse().unwrap());
+    headers.insert("Authorization", token.parse().unwrap());
 
     let mut conn = redis_pool.get().await.unwrap();
     let _reply: redis::Value = cmd("SET")

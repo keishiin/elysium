@@ -13,7 +13,7 @@ use axum::{
     Router,
 };
 use hyper::{
-    header::{AUTHORIZATION, CONTENT_TYPE},
+    header::{AUTHORIZATION, CONTENT_TYPE, COOKIE},
     Method,
 };
 use tower_http::{
@@ -25,13 +25,13 @@ pub fn create_router(state: AppState) -> Router {
     let cors: CorsLayer = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PUT])
         .allow_origin(["http://localhost:5173".parse().unwrap()])
-        .allow_headers([AUTHORIZATION, CONTENT_TYPE])
-        .expose_headers(["set-cookie".parse().unwrap()])
+        .allow_headers([AUTHORIZATION, CONTENT_TYPE, "cookies".parse().unwrap(), "axum-accountId".parse().unwrap()])
+        .expose_headers(["authorization".parse().unwrap()])
         .allow_credentials(true);
 
     Router::new()
         .route("/", get(root))
-        .route("/users", get(get_user))
+        .route("/users", post(get_user))
         .route("/users/psn_code", put(update_psn_code))
         .route("/users/steam_id", put(update_steam_id))
         .route_layer(middleware::from_fn_with_state(state.clone(), require_auth))

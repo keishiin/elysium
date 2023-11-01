@@ -31,7 +31,5 @@ pub async fn run(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
         .serve(router.into_make_service())
         .await?;
 
-    // redis_conn.await??;
-
     Ok(())
 }

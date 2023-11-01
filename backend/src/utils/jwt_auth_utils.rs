@@ -38,7 +38,7 @@ pub fn validate_token(token: &str) -> Result<bool, ApiError> {
             jsonwebtoken::errors::ErrorKind::InvalidToken
             | jsonwebtoken::errors::ErrorKind::InvalidSignature
             | jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
-                ApiError::new(StatusCode::UNAUTHORIZED, "in: Validate not authenticated!")
+                ApiError::new(StatusCode::UNAUTHORIZED, "Not authenticated!")
             }
             _ => {
                 eprintln!("Error validating token: {:?}", error);

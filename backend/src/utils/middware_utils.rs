@@ -28,7 +28,7 @@ pub fn get_header(headers: HeaderMap, key: String) -> Result<String, ApiError> {
     } else {
         return Err(ApiError::new(
             StatusCode::UNAUTHORIZED,
-            "not authenticated!",
+            "Not authenticated!",
         ));
     };
     Ok(header_token)

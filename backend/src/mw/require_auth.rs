@@ -27,7 +27,7 @@ pub async fn require_auth<T>(
     let reply: redis::Value = cmd("GET").arg(header_token).query_async(&mut *conn).await.unwrap();
 
     if reply == redis::Value::Nil {
-        return Err(ApiError::new(StatusCode::UNAUTHORIZED, "reply was nil"));
+        return Err(ApiError::new(StatusCode::UNAUTHORIZED, "Not authenticated!"));
     } else if let redis::Value::Data(data) = reply {
         let reply_str = std::str::from_utf8(&data).unwrap();
         if reply_str == header_user_token {
@@ -35,7 +35,7 @@ pub async fn require_auth<T>(
         } else {
             return Err(ApiError::new(
                 StatusCode::UNAUTHORIZED,
-                "first outer for stuff",
+                "Not authenticated!",
             ));
         }
     } else {

@@ -1,17 +1,20 @@
 use axum::{extract::State, Json};
+use hyper::HeaderMap;
 
 use crate::models::users::{ResponseUser, UserRequestsWithAuth};
 use crate::queries::users_q::{
-    get_user_by_id, get_user_by_username, update_psn_code_save, update_steam_id_save,
+    get_user_by_id, update_psn_code_save, update_steam_id_save,
 };
 use crate::utils::errors::ApiError;
+use crate::utils::middware_utils::get_header;
 use sea_orm::DatabaseConnection;
 
 pub async fn get_user(
     State(db): State<DatabaseConnection>,
-    user_info: Json<UserRequestsWithAuth>,
+    headers: HeaderMap
 ) -> Result<Json<ResponseUser>, ApiError> {
-    let user = get_user_by_username(&db, user_info.username.clone()).await?;
+    let header_user_token = get_header(headers, "axum-accountId".to_string())?;
+    let user = get_user_by_id(&db, header_user_token.clone()).await?;
 
     Ok(Json(ResponseUser {
         id: user.id,

@@ -13,7 +13,7 @@ use axum::{
     Router,
 };
 use hyper::{
-    header::{AUTHORIZATION, CONTENT_TYPE, COOKIE},
+    header::{AUTHORIZATION, CONTENT_TYPE},
     Method,
 };
 use tower_http::{

@@ -21,8 +21,6 @@ pub async fn require_auth<T>(
     let header_token = get_header(headers.clone(), "Authorization".to_string())?;
     let header_user_token = get_header(headers, "axum-accountId".to_string())?;
 
-    eprintln!("auth_header: {:?}", header_token.clone());
-
     validate_token(&&header_token.clone())?;
 
     let mut conn = redis_pool.get().await.unwrap();

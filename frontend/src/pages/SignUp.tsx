@@ -1,16 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import apiClient from "../services/api-common";
+import { isValidPassword, isValidEmail } from "../utils/regex_utils";
 
 function SignUp() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<CustomError | null>(null);
   const nav = useNavigate();
 
-  const { isLoading: isPostingUser, mutate: postUser } = useMutation(
+  const { mutate: postUser } = useMutation(
     async () => {
       return apiClient.post("auth/signup", {
         username: username,
@@ -23,22 +25,31 @@ function SignUp() {
         nav("/userProfile");
       },
       onError: (err) => {
-        console.log(`Error: ${err}`);
+        setError((err as any).response.data as CustomError);
       },
     },
   );
-
-  useEffect(() => {
-    if (isPostingUser) {
-      console.log(isPostingUser);
-    }
-  }, [isPostingUser]);
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
 
     if (password !== passwordCheck) {
-      console.log("passwords dont match");
+      setError({ error: "Passwords to dot match" });
+      cleanUp(event);
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setError({
+        error:
+          "Invalid password. Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long.",
+      });
+      cleanUp(event);
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError({ error: "Invalid email address. Please enter a valid email." });
       cleanUp(event);
       return;
     }
@@ -63,6 +74,9 @@ function SignUp() {
   return (
     <div className="bg-gray-100 flex justify-center items-center h-screen">
       <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
+        {error && (
+          <div className="text-red-500 mt-2 text-center">{error.error}</div>
+        )}
         <h1 className="text-2xl font-semibold mb-4">Sign Up</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

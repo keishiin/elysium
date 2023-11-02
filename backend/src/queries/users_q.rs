@@ -10,7 +10,7 @@ pub async fn create_user(
     let user = user.insert(db).await.map_err(|error| {
         let error_message = error.to_string();
 
-        if error_message.contains("Query Error: error returned from database: duplicate key value violates unique constraint \"users_user_name_key\"")
+        if error_message.contains("Query Error: error returned from database: duplicate key value violates unique constraint \"unique_username\"")
         {
             ApiError::new(StatusCode::BAD_REQUEST, "username has already been taken")
         } else {

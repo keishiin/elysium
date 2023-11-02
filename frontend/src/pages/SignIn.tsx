@@ -1,14 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "react-query";
 import apiClient from "../services/api-common";
 
 function SignIn() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<CustomError | null>(null);
   const nav = useNavigate();
 
-  const { isLoading: isPostingUser, mutate: postUser } = useMutation(
+  const { mutate: postUser } = useMutation(
     async () => {
       return await apiClient.post("auth/signin", {
         username: username,
@@ -20,16 +21,10 @@ function SignIn() {
         nav("/userProfile");
       },
       onError: (err) => {
-        console.log(`Error: ${err}`);
+        setError((err as any).response.data as CustomError);
       },
     },
   );
-
-  useEffect(() => {
-    if (isPostingUser) {
-      console.log(isPostingUser);
-    }
-  }, [isPostingUser]);
 
   const postData = (event: any) => {
     event.preventDefault();
@@ -37,15 +32,10 @@ function SignIn() {
     try {
       postUser();
     } catch (err) {
-      cleanUp(event);
-      console.log("error");
+      event.target.reset();
+      setUserName("");
+      setPassword("");
     }
-  };
-
-  const cleanUp = (event: any) => {
-    event.target.reset();
-    setUserName("");
-    setPassword("");
   };
 
   return (
@@ -58,6 +48,9 @@ function SignIn() {
         ></img>
       </div>
       <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
+        {error && (
+          <div className="text-red-500 mt-2 text-center">{error.error}</div>
+        )}
         <h1 className="text-2xl font-semibold mb-4">Login</h1>
         <form onSubmit={postData}>
           <div className="mb-4">

@@ -9,6 +9,7 @@ import ErrorPage from "./pages/Error.tsx";
 import UserProfile from "./pages/UserProfile.tsx";
 import Trophies from "./pages/Trophies.tsx";
 import { QueryClient, QueryClientProvider } from "react-query";
+import UpdateUserInfo from "./pages/UpdateUserInfo.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: "/steam",
     element: <Trophies platform="steam" />,
+  },
+  {
+    path: "/updateInfo",
+    element: <UpdateUserInfo />,
   },
 ]);
 

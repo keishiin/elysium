@@ -31,3 +31,4 @@ impl IntoResponse for ApiError {
 struct ErrorResponse {
     error: String,
 }
+

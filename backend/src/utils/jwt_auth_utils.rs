@@ -47,4 +47,3 @@ pub fn validate_token(token: &str) -> Result<bool, ApiError> {
         })
         .map(|_claim| true)
 }
-

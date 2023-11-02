@@ -68,7 +68,7 @@ pub async fn get_user_by_username(
     username: String,
 ) -> Result<UserModel, ApiError> {
     Users::find()
-        .filter(users::Column::UserName.eq(username))
+        .filter(users::Column::Username.eq(username))
         .one(db)
         .await
         .map_err(|error| {
@@ -95,14 +95,28 @@ pub async fn update_steam_id_save(
     Ok(())
 }
 
-pub async fn update_psn_code_save(
+pub async fn update_psn_id_save(
     db: &DatabaseConnection,
     user: UserModel,
-    psn_auth_code: String,
+    psn_id: String,
 ) -> Result<(), ApiError> {
     let mut user = user.into_active_model();
 
-    user.psn_auth_code = Set(Some(psn_auth_code));
+    user.psn_id = Set(Some(psn_id));
+
+    save_user(db, user).await?;
+
+    Ok(())
+}
+
+pub async fn update_xbox_id_save(
+    db: &DatabaseConnection,
+    user: UserModel,
+    xbox_id: String,
+) -> Result<(), ApiError> {
+    let mut user = user.into_active_model();
+
+    user.xbox_id = Set(Some(xbox_id));
 
     save_user(db, user).await?;
 

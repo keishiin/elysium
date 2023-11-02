@@ -1,8 +1,4 @@
-use crate::utils::{
-    errors::ApiError,
-    jwt_auth_utils::validate_token,
-    middware_utils::get_header,
-};
+use crate::utils::{errors::ApiError, jwt_auth_utils::validate_token, middware_utils::get_header};
 use axum::{
     extract::State,
     http::{HeaderMap, Request},
@@ -24,10 +20,17 @@ pub async fn require_auth<T>(
     validate_token(&&header_token.clone())?;
 
     let mut conn = redis_pool.get().await.unwrap();
-    let reply: redis::Value = cmd("GET").arg(header_token).query_async(&mut *conn).await.unwrap();
+    let reply: redis::Value = cmd("GET")
+        .arg(header_token)
+        .query_async(&mut *conn)
+        .await
+        .unwrap();
 
     if reply == redis::Value::Nil {
-        return Err(ApiError::new(StatusCode::UNAUTHORIZED, "Not authenticated!"));
+        return Err(ApiError::new(
+            StatusCode::UNAUTHORIZED,
+            "Not authenticated!",
+        ));
     } else if let redis::Value::Data(data) = reply {
         let reply_str = std::str::from_utf8(&data).unwrap();
         if reply_str == header_user_token {

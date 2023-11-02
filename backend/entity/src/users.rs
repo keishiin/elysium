@@ -8,13 +8,12 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     #[sea_orm(unique)]
-    pub user_name: String,
+    pub username: String,
     pub password: String,
     pub email: String,
     pub steam_id: Option<String>,
-    pub psn_auth_code: Option<String>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
+    pub psn_id: Option<String>,
+    pub xbox_id: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

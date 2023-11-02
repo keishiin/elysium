@@ -24,11 +24,9 @@ pub async fn signup(
 ) -> Result<(HeaderMap), ApiError> {
     let new_user = users::ActiveModel {
         id: Set(Uuid::new_v4().to_string()),
-        user_name: Set(req_user.username.clone()),
+        username: Set(req_user.username.clone()),
         password: Set(hash_password(&req_user.password)?),
         email: Set(req_user.email.clone()),
-        steam_id: Set(req_user.steam_id.clone()),
-        psn_auth_code: Set(req_user.psn_auth_code.clone()),
         ..Default::default()
     };
 
@@ -55,7 +53,7 @@ pub async fn signin(
     State(db): State<DatabaseConnection>,
     State(redis_pool): State<Pool<RedisConnectionManager>>,
     user_info: Json<UserRequest>,
-) -> Result<(HeaderMap), ApiError> {
+) -> Result<HeaderMap, ApiError> {
     let user = get_user_by_username(&db, user_info.username.clone()).await?;
 
     if !verify_password(&user_info.password, &user.password)? {
@@ -78,10 +76,8 @@ pub async fn signin(
         .await
         .unwrap();
 
-
     Ok(headers)
 }
-
 
 pub async fn signout(
     State(redis_pool): State<Pool<RedisConnectionManager>>,
@@ -90,7 +86,11 @@ pub async fn signout(
     let header_token = get_header(headers, "Authorization".to_string())?;
 
     let mut conn = redis_pool.get().await.unwrap();
-    let _reply: redis::Value = cmd("DEL").arg(header_token).query_async(&mut *conn).await.unwrap();
+    let _reply: redis::Value = cmd("DEL")
+        .arg(header_token)
+        .query_async(&mut *conn)
+        .await
+        .unwrap();
 
     Ok(StatusCode::OK)
 }

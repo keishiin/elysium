@@ -19,6 +19,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Users::Password).string().not_null())
                     .col(ColumnDef::new(Users::SteamId).string())
                     .col(ColumnDef::new(Users::PsnId).string())
+                    .col(ColumnDef::new(Users::XboxId).string())
                     .to_owned(),
             )
             .await
@@ -40,4 +41,5 @@ enum Users {
     Password,
     SteamId,
     PsnId,
+    XboxId,
 }

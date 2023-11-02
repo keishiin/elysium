@@ -1,10 +1,14 @@
 # webapp 
 
 ## Backend
-### Rust + Axum
+```
+Rust + Axum
+```
 
 ## Frontend
-### Typescript + React
+```
+Typescript + React
+```
 
 ## To start the backend, postgresdb, and redis and nginx
 ```

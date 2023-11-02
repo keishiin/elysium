@@ -21,7 +21,7 @@ pub async fn signup(
     State(db): State<DatabaseConnection>,
     State(redis_pool): State<Pool<RedisConnectionManager>>,
     req_user: Json<User>,
-) -> Result<(HeaderMap), ApiError> {
+) -> Result<HeaderMap, ApiError> {
     let new_user = users::ActiveModel {
         id: Set(Uuid::new_v4().to_string()),
         username: Set(req_user.username.clone()),

@@ -16,14 +16,11 @@ function SignIn() {
       });
     },
     {
-      onSuccess: (res) => {
-        if (localStorage.getItem("user") != null) {
-          localStorage.removeItem("user");
-        }
-        localStorage.setItem("user", JSON.stringify(res.data));
+      onSuccess: () => {
+        nav("/userProfile");
       },
       onError: (err) => {
-        console.log(err);
+        console.log(`Error: ${err}`);
       },
     },
   );
@@ -39,7 +36,6 @@ function SignIn() {
 
     try {
       postUser();
-      nav("/userProfile");
     } catch (err) {
       cleanUp(event);
       console.log("error");

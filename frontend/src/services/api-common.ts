@@ -10,16 +10,18 @@ const apiClient = axios.create({
 
 apiClient.interceptors.response.use(
   (response) => {
+    if (response.config.method === "post") {
+      const customHeader = response.headers["authorization"];
+      const customHeader2 = response.headers["axum-accountid"];
 
-    const customHeader = response.headers['authorization'];
-    if (customHeader) {
-      localStorage.setItem("token", customHeader)
+      localStorage.setItem("token", customHeader);
+      localStorage.setItem("user", customHeader2);
     }
     return response;
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

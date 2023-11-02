@@ -18,17 +18,12 @@ function SignUp() {
         email: email,
       });
     },
-
     {
-      onSuccess: (res) => {
-        if (localStorage.getItem("user") != null) {
-          localStorage.removeItem("user");
-        }
-        localStorage.setItem("user", JSON.stringify(res.data));
-        console.log("this is the response data", res.data);
+      onSuccess: () => {
+        nav("/userProfile");
       },
       onError: (err) => {
-        console.log(err);
+        console.log(`Error: ${err}`);
       },
     },
   );
@@ -50,10 +45,9 @@ function SignUp() {
 
     try {
       postUser();
-      nav("/userProfile");
     } catch (err) {
       cleanUp(event);
-      console.log(err);
+      console.log(`Error: ${err}`);
     }
   };
 

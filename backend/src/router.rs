@@ -27,7 +27,7 @@ pub fn create_router(state: AppState) -> Router {
             CONTENT_TYPE,
             "axum-accountId".parse().unwrap(),
         ])
-        .expose_headers(["authorization".parse().unwrap()])
+        .expose_headers(["authorization".parse().unwrap(), "axum-accountId".parse().unwrap()])
         .allow_credentials(true);
 
     Router::new()

@@ -1,6 +1,7 @@
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, PartialEq)]
 pub struct ApiError {
     code: StatusCode,
     message: String,
@@ -31,4 +32,3 @@ impl IntoResponse for ApiError {
 struct ErrorResponse {
     error: String,
 }
-

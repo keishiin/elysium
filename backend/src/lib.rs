@@ -5,12 +5,12 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::router::create_router;
 
-mod api;
+pub mod api;
 pub mod app_state;
-mod models;
-mod mw;
-mod queries;
-mod router;
+pub mod models;
+pub mod mw;
+pub mod queries;
+pub mod router;
 pub mod utils;
 
 pub async fn run(state: AppState) -> Result<(), Box<dyn std::error::Error>> {

@@ -1,9 +1,8 @@
+use crate::utils::errors::ApiError;
 use axum::http::StatusCode;
 use chrono::Duration;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
-
-use crate::utils::errors::ApiError;
 
 #[derive(Serialize, Deserialize)]
 struct Claims {

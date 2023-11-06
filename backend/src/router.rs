@@ -27,21 +27,24 @@ pub fn create_router(state: AppState) -> Router {
             CONTENT_TYPE,
             "axum-accountId".parse().unwrap(),
         ])
-        .expose_headers(["authorization".parse().unwrap(), "axum-accountId".parse().unwrap()])
+        .expose_headers([
+            "authorization".parse().unwrap(),
+            "axum-accountId".parse().unwrap(),
+        ])
         .allow_credentials(true);
 
     Router::new()
-        .route("/", get(root))
         .route("/users", get(get_user))
         .route("/users/psn_id", put(update_psn_id))
         .route("/users/xbox_id", put(update_xbox_id))
         .route("/users/steam_id", put(update_steam_id))
         .route_layer(middleware::from_fn_with_state(state.clone(), require_auth))
         .route("/auth/signout", post(signout))
-        .route("/index", get(index))
-        .route("/health", get(healthcheck))
         .route("/auth/signup", post(signup))
         .route("/auth/signin", post(signin))
+        .route("/index", get(index))
+        .route("/health", get(healthcheck))
+        .route("/", get(root))
         .fallback(fallback)
         .with_state(state)
         .layer(TraceLayer::new_for_http())

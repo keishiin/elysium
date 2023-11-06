@@ -1,6 +1,5 @@
-use axum::http::{HeaderMap, StatusCode};
-
 use super::errors::ApiError;
+use axum::http::{HeaderMap, StatusCode};
 
 pub fn split_by_double_quotes(input: &str) -> Result<String, ApiError> {
     let start = input.find('"').ok_or(ApiError::new(

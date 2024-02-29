@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use axum::http::{HeaderMap, StatusCode};
-    use serde::{Deserialize, Serialize};
     use webapp::{
         self,
         utils::{
@@ -11,11 +10,6 @@ mod tests {
             middware_utils::{get_header, split_by_double_quotes},
         },
     };
-
-    #[derive(Serialize, Deserialize, PartialEq, Debug)]
-    struct ErrorResponse {
-        error: String,
-    }
 
     #[test]
     fn test_hash_password_succeds() {

@@ -28,7 +28,7 @@ impl IntoResponse for ApiError {
     }
 }
 
-#[derive(Serialize, Deserialize)]
-struct ErrorResponse {
-    error: String,
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct ErrorResponse {
+    pub error: String,
 }

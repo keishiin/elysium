@@ -40,13 +40,7 @@ async fn create_new_app() -> TestServer {
 mod tests {
     use super::*;
     use axum::http::StatusCode;
-    use serde::{Deserialize, Serialize};
-    use webapp::models::response::Response;
-
-    #[derive(Serialize, Deserialize, PartialEq, Debug)]
-    struct ErrorResponse {
-        error: String,
-    }
+    use webapp::{models::response::Response, utils::errors::ErrorResponse};
 
     #[tokio::test]
     async fn test_root_route_success() {

@@ -3164,8 +3164,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
-name = "steam_wrapper"
+name = "steam_api_wrapper"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d6d20a40e0ea68aa25585ae181f292fe03a1ee49e492a0fe7565b5b175471d3"
 dependencies = [
  "anyhow",
  "dotenv",
@@ -3764,7 +3766,7 @@ dependencies = [
  "redis",
  "sea-orm",
  "serde",
- "steam_wrapper",
+ "steam_api_wrapper",
  "tokio",
  "tower",
  "tower-http",

@@ -20,6 +20,7 @@ async fn create_new_app() -> TestServer {
 
     let redis_manager = RedisConnectionManager::new("redis://localhost").unwrap();
     let redis_connection = bb8::Pool::builder().build(redis_manager).await.unwrap();
+    let steam_api_key = std::env::var("STEAM_API_KEY").expect("No steam api key avail");
 
     let redis_pool = redis_connection.clone();
     let mut _conn = redis_pool.get().await.unwrap();
@@ -27,6 +28,7 @@ async fn create_new_app() -> TestServer {
     let state = AppState {
         db,
         redis_connection,
+        steam_api_key,
     };
 
     let app = create_router(state);

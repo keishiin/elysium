@@ -20,9 +20,9 @@ env_logger = "0.11.2"
 bb8-redis = "0.14.0"
 axum-test = "14.2.2"
 jsonwebtoken = "9.0.0"
+steam_api_wrapper = "0.1.0"
 entity = { path = "../backend/entity" }
 migration = { path = "../backend/migration" }
-steam_wrapper = { path = "../../steam_wrapper" }
 hyper = { version = "1.1.0", features = ["full"] }
 tokio = { version = "1.0", features = ["full"] }
 serde = { version = "1", features = ["derive"] }

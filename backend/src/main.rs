@@ -10,6 +10,7 @@ async fn main() {
 
     let redis_url = std::env::var("REDIS_URL").expect("No host set for redis");
     let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let steam_api_key = std::env::var("STEAM_API_KEY").expect("No steam api key avail");
 
     eprintln!("db url: {:?}", db_url);
     eprintln!("redis url: {:?}", redis_url);
@@ -33,6 +34,7 @@ async fn main() {
     let state = AppState {
         db,
         redis_connection,
+        steam_api_key,
     };
 
     let _ = run(state).await;

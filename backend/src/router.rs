@@ -1,6 +1,9 @@
 use crate::{
     api::{
-        api::{fallback, healthcheck, index, root}, auth::{signin, signout, signup}, steam::player_owned_games, users::{get_user, update_psn_id, update_steam_id, update_xbox_id}
+        api::{fallback, healthcheck, index, root},
+        auth::{signin, signout, signup},
+        steam::{get_player_recently_played_games, player_owned_games, player_summary},
+        users::{get_user, update_psn_id, update_steam_id, update_xbox_id},
     },
     app_state::AppState,
     mw::require_auth::require_auth,
@@ -37,6 +40,11 @@ pub fn create_router(state: AppState) -> Router {
         .route("/users/xbox_id", put(update_xbox_id))
         .route("/users/steam_id", put(update_steam_id))
         .route("/steam/games", get(player_owned_games))
+        .route("/steam/player-profile", get(player_summary))
+        .route(
+            "/steam/recently-played",
+            get(get_player_recently_played_games),
+        )
         .route_layer(middleware::from_fn_with_state(state.clone(), require_auth))
         .route("/auth/signout", post(signout))
         .route("/auth/signup", post(signup))

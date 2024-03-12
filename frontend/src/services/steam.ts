@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import apiClient from "./api-common";
 import { useState } from "react";
 
-const get_player_info = () => {
+export const get_player_info = () => {
     const [token] = useState(localStorage.getItem("token"));
     const [userId] = useState(localStorage.getItem("user"));
     
@@ -22,4 +22,35 @@ const get_player_info = () => {
     );
 }
 
-export default get_player_info;
+export const get_onwed_games = (cursor: number) => {
+    const [token] = useState(localStorage.getItem("token"));
+    const [userId] = useState(localStorage.getItem("user"));
+
+    let url: string;
+
+    if (cursor > 0) {
+        url = `steam/games?cursor=${cursor}`;
+    } else {
+        url = `steam/games`
+    }
+    
+    return useQuery(
+        "owned-games",
+        async () => {
+            const response = await apiClient.get(
+                url, {
+                    headers: {
+                        "axum-accountId": userId,
+                        Authorization: token,
+                    }
+                }
+            )
+            return response.data
+        }
+    )
+}
+
+export default {
+    get_player_info, 
+    get_onwed_games,
+};

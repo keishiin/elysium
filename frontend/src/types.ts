@@ -34,3 +34,13 @@ interface PlayerInfo {
   locstatecode?: string,
    loccityid?: number,
 }
+
+interface Game {
+  app_id: number,
+  name?: string,
+  recent_play_time?: number,
+  total_play_time?: number,
+  img_icon_url?: string,
+  img_logo_url?: string,
+  has_community_visible_stats?: boolean
+}

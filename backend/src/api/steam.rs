@@ -47,8 +47,6 @@ pub async fn player_owned_games(
 
     let steam = Steam::new(api_key.as_str());
 
-    // let steam_id = steam_id_to_u64(user.steam_id)?;
-
     let response = steam
         .get_owned_games(steam_id_to_u64(user.steam_id)?, true, false)
         .await

@@ -13,8 +13,6 @@ function Steam() {
   if (playerInfo.isLoading || ownedGames.isLoading) return <Loading />;
   
   if (playerInfo.isError || ownedGames.isError) return <ErrorComponent />;
-  
-  console.log(ownedGames.data["data"]);
 
   
   return (
@@ -26,12 +24,10 @@ function Steam() {
               {playerInfo.data["response"].map((player: PlayerInfo) => (
                   <div key={player.steamid}>
                     <img src={player.avatarfull}></img>
-                    <li>{player.communityvisibilitystate}</li>
-                    <li>{player.profilestate}</li>
                     <li>{player.personaname}</li>
                     <li>{player.steamid}</li>
-                    <li>{player.timecreated}</li>
-                    <li>{player.lastlogoff}</li>
+                    <li>Account Created: {player.timecreated ? new Date(player.timecreated * 1000).toLocaleString() : "Unknown"}</li>
+                    <li>Last Online: {player.lastlogoff ? new Date(player.lastlogoff * 1000).toLocaleString() : "Unknown"}</li>
                   </div>
               ))}
           </div>

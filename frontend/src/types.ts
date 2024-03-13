@@ -36,7 +36,7 @@ interface PlayerInfo {
 }
 
 interface Game {
-  app_id: number,
+  appid: number,
   name?: string,
   recent_play_time?: number,
   total_play_time?: number,

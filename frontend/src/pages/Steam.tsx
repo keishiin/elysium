@@ -1,47 +1,43 @@
-import { useState } from "react";
 import ErrorComponent from "../components/ErrorComponent";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import { get_onwed_games, get_player_info } from "../services/steam";
 import GameList from "../components/GameList";
+import SteamPlayer from "../components/SteamPlayer";
 
 function Steam() {
-  const [cursor, setCursor] = useState(0);
-  const playerInfo = get_player_info();
-  const ownedGames = get_onwed_games(cursor);
-  
-  if (playerInfo.isLoading || ownedGames.isLoading) return <Loading />;
-  
-  if (playerInfo.isError || ownedGames.isError) return <ErrorComponent />;
+    const playerInfo = get_player_info();
+    const ownedGames = get_onwed_games(104);
 
-  
-  return (
-    <>
-        <Navbar />
-        <h1>Steam</h1>
-        <section >
-          <div>
-              {playerInfo.data["response"].map((player: PlayerInfo) => (
-                  <div key={player.steamid}>
-                    <img src={player.avatarfull}></img>
-                    <li>{player.personaname}</li>
-                    <li>{player.steamid}</li>
-                    <li>Account Created: {player.timecreated ? new Date(player.timecreated * 1000).toLocaleString() : "Unknown"}</li>
-                    <li>Last Online: {player.lastlogoff ? new Date(player.lastlogoff * 1000).toLocaleString() : "Unknown"}</li>
-                  </div>
-              ))}
-          </div>
-        </section>
-        <input type="number" onChange={(event) => setCursor(parseInt(event.target.value))} />
+    if (playerInfo.isLoading || ownedGames.isLoading) return <Loading />;
 
-        <section>
-            <GameList games={ownedGames.data["data"]}/>
-        </section>
+    if (playerInfo.isError || ownedGames.isError) return <ErrorComponent />;
 
-
-    </>
-);
+    return (
+        <>
+            <Navbar />
+            <section>
+                <SteamPlayer player={playerInfo.data["response"][0]} />
+            </section>
+            <section>
+                <GameList games={ownedGames.data["data"]} />
+                <div className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
+                    <span className="text-xs xs:text-sm text-gray-900">
+                        Showing 1 to 4 of 50 Entries
+                    </span>
+                    <div className="inline-flex mt-2 xs:mt-0">
+                        <button className="text-sm text-indigo-50 transition duration-150 hover:bg-indigo-500 bg-indigo-600 font-semibold py-2 px-4 rounded-l">
+                            Prev
+                        </button>
+                        &nbsp; &nbsp;
+                        <button className="text-sm text-indigo-50 transition duration-150 hover:bg-indigo-500 bg-indigo-600 font-semibold py-2 px-4 rounded-r">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </>
+    );
 }
-
 
 export default Steam;

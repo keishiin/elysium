@@ -28,7 +28,9 @@ pub async fn run(state: AppState) -> Result<(), Box<dyn std::error::Error>> {
     tracing::debug!("listening on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, router.into_make_service()).await.unwrap();
+    axum::serve(listener, router.into_make_service())
+        .await
+        .unwrap();
 
     // axum::Server::bind(&addr)
     //     .serve(router.into_make_service())

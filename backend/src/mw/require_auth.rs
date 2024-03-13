@@ -1,12 +1,11 @@
 use crate::utils::{errors::ApiError, jwt_auth_utils::validate_token, middware_utils::get_header};
 use axum::{
-    extract::{State, Request},
+    extract::{Request, State},
     http::{HeaderMap, StatusCode},
     middleware::Next,
     response::Response,
 };
 use bb8_redis::{bb8::Pool, redis::cmd, RedisConnectionManager};
-// use hyper::StatusCode;
 
 pub async fn require_auth(
     State(redis_pool): State<Pool<RedisConnectionManager>>,
@@ -43,7 +42,7 @@ pub async fn require_auth(
         }
     } else {
         // this should never be able to make it here hopefully
-        // horrendous error handling by me 
+        // horrendous error handling by me
         unreachable!()
     }
 }

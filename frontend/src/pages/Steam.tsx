@@ -1,7 +1,7 @@
 import ErrorComponent from "../components/ErrorComponent";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import { get_onwed_games, get_player_info } from "../services/steam";
+import { get_onwed_games } from "../services/steam";
 import GameList from "../components/GameList";
 
 function Steam() {
@@ -16,7 +16,7 @@ function Steam() {
             <Navbar />
             <section>
                 <GameList games={ownedGames.data["data"]} />
-                <div className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
+                <div className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
                     <span className="text-xs xs:text-sm text-gray-900">
                         Showing 1 to 4 of 50 Entries
                     </span>

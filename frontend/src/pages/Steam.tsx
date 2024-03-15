@@ -3,22 +3,17 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import { get_onwed_games, get_player_info } from "../services/steam";
 import GameList from "../components/GameList";
-import SteamPlayer from "../components/SteamPlayer";
 
 function Steam() {
-    const playerInfo = get_player_info();
     const ownedGames = get_onwed_games(104);
 
-    if (playerInfo.isLoading || ownedGames.isLoading) return <Loading />;
+    if (ownedGames.isLoading) return <Loading />;
 
-    if (playerInfo.isError || ownedGames.isError) return <ErrorComponent />;
+    if (ownedGames.isError) return <ErrorComponent />;
 
     return (
         <>
             <Navbar />
-            <section>
-                <SteamPlayer player={playerInfo.data["response"][0]} />
-            </section>
             <section>
                 <GameList games={ownedGames.data["data"]} />
                 <div className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">

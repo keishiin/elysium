@@ -1,24 +1,29 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState, useRef } from "react";
 import { useMutation } from "react-query";
 import apiClient from "../services/api-common";
+import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
+import { LabelInputContainer } from "../components/ui/labelInputContainer";
+import { BottomGradient } from "../components/ui/bottomGradient";
 
 function SignIn() {
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<CustomError | null>(null);
   const nav = useNavigate();
 
   const { mutate: postUser } = useMutation(
-    async () => {
+    async (userData: { username: string; password: string }) => {
       return await apiClient.post("auth/signin", {
-        username: username,
-        password: password,
+        username: userData.username,
+        password: userData.password,
       });
     },
     {
       onSuccess: () => {
-        nav("/userProfile");
+        nav("/profile");
       },
       onError: (err) => {
         setError((err as any).response.data as CustomError);
@@ -28,18 +33,14 @@ function SignIn() {
 
   const postData = (event: any) => {
     event.preventDefault();
+    const usernameValue = usernameRef.current?.value || "";
+    const passwordValue = passwordRef.current?.value || "";
 
-    try {
-      postUser();
-    } catch (err) {
-      event.target.reset();
-      setUserName("");
-      setPassword("");
-    }
+    postUser({ username: usernameValue, password: passwordValue });
   };
 
   return (
-    <div className="bg-gray-100 flex justify-center items-center h-screen">
+    <div className="flex bg-black justify-center items-center h-screen">
       <div className="w-1/2 h-screen hidden lg:block">
         <img
           src="../../images/photo-1698207873249-640dab81d84e.jpg"
@@ -47,63 +48,70 @@ function SignIn() {
           className="object-cover w-full h-full"
         ></img>
       </div>
-      <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
+      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+        <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+          Login into Webapp
+        </h2>
         {error && (
-          <div className="text-red-500 mt-2 text-center">{error.error}</div>
+          <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+            {error.error}
+          </p>
         )}
-        <h1 className="text-2xl font-semibold mb-4">Login</h1>
-        <form onSubmit={postData}>
-          <div className="mb-4">
-            <label className="block text-gray-600">Username</label>
-            <input
-              type="text"
+        <form className="my-8" onSubmit={postData}>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="username">Username</Label>
+            <Input
               id="username"
-              name="username"
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              onChange={(event) => setUserName(event.target.value)}
-            ></input>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-600">Password</label>
-            <input
-              type="password"
+              placeholder="username"
+              type="text"
+              ref={usernameRef}
+            />
+          </LabelInputContainer>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="password">Password</Label>
+            <Input
               id="password"
-              name="password"
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              onChange={(event) => setPassword(event.target.value)}
-            ></input>
-          </div>
-          <div className="mb-4 flex items-center">
-            <input
-              type="checkbox"
-              id="remember"
-              name="remember"
-              className="text-blue-500"
-            ></input>
-            <label className="text-gray-600 ml-2">Remember Me</label>
-          </div>
-          <div className="mb-6 text-blue-500">
-            <Link to="/" className="hover:underline">
-              Forgot Password?
-            </Link>
-          </div>
+              placeholder="••••••••"
+              type="password"
+              ref={passwordRef}
+            />
+          </LabelInputContainer>
+
           <button
+            className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
           >
-            Login
+            Login &rarr;
+            <BottomGradient />
           </button>
+
+          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
+          <div className="flex flex-col space-y-4">
+            <button
+              className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              type="button"
+              onClick={() => nav("/signup")}
+            >
+              <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                Signin
+              </span>
+              <BottomGradient />
+            </button>
+            <button
+              className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              type="button"
+              onClick={() => nav("/")}
+            >
+              <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                Home
+              </span>
+              <BottomGradient />
+            </button>
+          </div>
         </form>
-        <div className="mt-6 text-blue-500 text-center">
-          <Link to="/signup" className="hover:underline">
-            Sign up
-          </Link>
-        </div>
-        <div className="mt-6 text-blue-500 text-center">
-          <Link to="/" className="hover:underline">
-            Home
-          </Link>
-        </div>
       </div>
     </div>
   );

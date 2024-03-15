@@ -16,6 +16,12 @@ interface UserData {
   password: string;
 }
 
+interface RegisterUserData {
+  username: string;
+  password: string;
+  email: string;
+}
+
 interface PlayerInfo {
   steamid: string;
   communityvisibilitystate: number;

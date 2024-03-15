@@ -1,23 +1,33 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import apiClient from "../services/api-common";
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
 import { isValidPassword, isValidEmail } from "../utils/regex_utils";
+import { BottomGradient } from "../components/ui/bottomGradient";
+import { LabelInputContainer } from "../components/ui/labelInputContainer";
 
 function SignUp() {
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordCheck, setPasswordCheck] = useState("");
-  const [email, setEmail] = useState("");
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const passwordCheckRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<CustomError | null>(null);
   const nav = useNavigate();
 
   const { mutate: postUser } = useMutation(
-    async () => {
+    async (registerUserData: {
+      username: string;
+      password: string;
+      email: string;
+    }) => {
       return apiClient.post("auth/signup", {
-        username: username,
-        password: password,
-        email: email,
+        username: registerUserData.username,
+        password: registerUserData.password,
+        email: registerUserData.email,
       });
     },
     {
@@ -32,110 +42,115 @@ function SignUp() {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
+    const usernameValue = usernameRef.current?.value || "";
+    const passwordValue = passwordRef.current?.value || "";
+    const passwordCheckValue = passwordCheckRef.current?.value || "";
+    const emailValue = emailRef.current?.value || "";
 
-    if (password !== passwordCheck) {
+    if (passwordValue !== passwordCheckValue) {
       setError({ error: "Passwords to dot match" });
-      cleanUp(event);
       return;
     }
 
-    if (!isValidPassword(password)) {
+    if (!isValidPassword(passwordValue)) {
       setError({
         error:
           "Invalid password. Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long.",
       });
-      cleanUp(event);
       return;
     }
 
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(emailValue)) {
       setError({ error: "Invalid email address. Please enter a valid email." });
-      cleanUp(event);
       return;
     }
 
-    try {
-      postUser();
-    } catch (err) {
-      cleanUp(event);
-      console.log(`Error: ${err}`);
-    }
-  };
-
-  const cleanUp = (event: any) => {
-    event.target.reset();
-
-    setUserName("");
-    setPassword("");
-    setPasswordCheck("");
-    setEmail("");
+    postUser({
+      username: usernameValue,
+      password: passwordValue,
+      email: emailValue,
+    });
   };
 
   return (
-    <div className="bg-gray-100 flex justify-center items-center h-screen">
-      <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
+    <div className="flex bg-black justify-center items-center h-screen">
+      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+        <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+          Signup into Webapp
+        </h2>
         {error && (
-          <div className="text-red-500 mt-2 text-center">{error.error}</div>
+          <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+            {error.error}
+          </p>
         )}
-        <h1 className="text-2xl font-semibold mb-4">Sign Up</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-600">Username</label>
-            <input
-              type="text"
+        <form className="my-8" onSubmit={handleSubmit}>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="username">Username</Label>
+            <Input
               id="username"
-              name="username"
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              onChange={(event) => setUserName(event.target.value)}
-            ></input>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-600">Email</label>
-            <input
+              placeholder="username"
               type="text"
-              id="email"
-              name="email"
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              onChange={(event) => setEmail(event.target.value)}
-            ></input>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-600">Password</label>
-            <input
-              type="password"
+              ref={usernameRef}
+            />
+          </LabelInputContainer>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" placeholder="email" type="text" ref={emailRef} />
+          </LabelInputContainer>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="password">Password</Label>
+            <Input
               id="password"
-              name="password"
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              onChange={(event) => setPassword(event.target.value)}
-            ></input>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-600">Confirm Password</label>
-            <input
+              placeholder="••••••••"
               type="password"
-              id="confrimPassword"
-              name="confirmPassword"
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              onChange={(event) => setPasswordCheck(event.target.value)}
-            ></input>
-          </div>
+              ref={passwordRef}
+            />
+          </LabelInputContainer>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="password2">Confirm Password</Label>
+            <Input
+              id="password2"
+              placeholder="••••••••"
+              type="password"
+              ref={passwordCheckRef}
+            />
+          </LabelInputContainer>
+
           <button
+            className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
           >
-            Sign Up
+            Signup &rarr;
+            <BottomGradient />
           </button>
+
+          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
+          <div className="flex flex-col space-y-4">
+            <button
+              className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              type="button"
+              onClick={() => nav("/login")}
+            >
+              <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                Login
+              </span>
+              <BottomGradient />
+            </button>
+            <button
+              className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+              type="button"
+              onClick={() => nav("/")}
+            >
+              <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
+                Home
+              </span>
+              <BottomGradient />
+            </button>
+          </div>
         </form>
-        <div className="mt-6 text-blue-500 text-center">
-          <Link to="/login" className="hover:underline">
-            Login
-          </Link>
-        </div>
-        <div className="mt-6 text-blue-500 text-center">
-          <Link to="/" className="hover:underline">
-            Home
-          </Link>
-        </div>
       </div>
       <div className="w-1/2 h-screen hidden lg:block">
         <img

@@ -1,150 +1,138 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import apiClient from "../services/api-common";
-import { useMutation, useQuery } from "react-query";
 import Navbar from "../components/Navbar";
+import { Card, CardBody, Image } from "@nextui-org/react";
+import { get_player_info } from "../services/steam";
+import Loading from "../components/Loading";
+import ErrorComponent from "../components/ErrorComponent";
 
 function UserProfile() {
-  const [data, setData] = useState<SignInResponse | undefined>(undefined);
-  const [token] = useState(localStorage.getItem("token"));
-  const [userId] = useState(localStorage.getItem("user"));
-  const nav = useNavigate();
+  const playerInfo = get_player_info();
 
-  const { refetch: getUser } = useQuery(
-    "get-user",
-    async () => {
-      return await apiClient.get("users", {
-        headers: {
-          "axum-accountId": userId,
-          Authorization: token,
-        },
-      });
-    },
-    {
-      onSuccess: (res) => {
-        setData(res?.data);
-      },
-      onError: () => {
-        nav("/");
-      },
-    },
-  );
+  if (playerInfo.isLoading) return <Loading />;
 
-  const { mutate: removeUser } = useMutation(
-    "remove-user",
-    async () => {
-      return await apiClient.post(
-        "auth/signout",
-        {},
-        {
-          headers: {
-            "axum-accountId": userId,
-            Authorization: token,
-          },
-        },
-      );
-    },
-    {
-      onSuccess: () => {
-        setData(undefined);
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
+  if (playerInfo.isError) return <ErrorComponent />;
 
-        nav("/");
-      },
-      onError: (err) => {
-        console.log(`Error: ${err}`);
-      },
-    },
-  );
-
-  useEffect(() => {
-    try {
-      getUser();
-    } catch (err) {
-      nav("/");
-    }
-  }, []);
-
-  const logout = () => {
-    try {
-      removeUser();
-    } catch (err) {
-      console.log(`Error: ${err}`);
-    }
-  };
+  const player = playerInfo.data["response"][0];
+  console.log(player);
 
   return (
-    <div>
+    <>
       <Navbar />
-      <div className="flex items-center h-screen w-full justify-center">
-        <div className="max-w-xs">
-          <div className="bg-white shadow-xl rounded-lg py-3">
-            <div className="photo-wrapper p-2">
-              <img
-                className="w-32 h-32 rounded-full mx-auto"
-                src="../../images/acastro_210113_1777_gamingstock_0002.jpg"
-                alt="TestUser"
-              ></img>
-            </div>
-            <div className="p-2">
-              <h3 className="text-center text-xl text-gray-900 font-medium leading-8">
-                {data?.username !== null ? data?.username : "Null"}
-              </h3>
-              <table className="text-xs my-3">
-                <tbody>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      Email
-                    </td>
-                    <td className="px-2 py-2">
-                      {data?.email !== null ? data?.email : "Null"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      SteamId
-                    </td>
-                    <td className="px-2 py-2">
-                      {data?.steam_id !== null ? data?.steam_id : "Null"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      PsnId
-                    </td>
-                    <td className="px-2 py-2">
-                      {data?.psn_id !== null ? data?.psn_id : "Null"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-2 py-2 text-gray-500 font-semibold">
-                      XboxId
-                    </td>
-                    <td className="px-2 py-2">
-                      {" "}
-                      {data?.xbox_id !== null ? data?.xbox_id : "Null"}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div className="mt-6 text-blue-500 text-center">
-                <button onClick={logout}>Sign out</button>
+      <div className="h-screen bg-black flex flex-col items-center">
+        <div className="max-w-[610px] w-full">
+          <Card className="text-white border-none bg-background/60 dark:bg-default-100/50">
+            <CardBody>
+              <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
+                <div className="relative col-span-6 md:col-span-4">
+                  <Image
+                    alt="player avatar"
+                    className="object-cover opacity-100"
+                    height={200}
+                    shadow="md"
+                    src={player.avatarfull}
+                    width="100%"
+                  />
+                </div>
+                <div className="flex flex-col col-span-6 md:col-span-8">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col gap-0">
+                      <h1 className="text-large font-medium mt-4">
+                        {player.personaname}
+                      </h1>
+                      <p className="text-small text-foreground/80">
+                        Account Created:{" "}
+                        {player.timecreated
+                          ? new Date(player.timecreated * 1000).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                      <p className="text-small text-foreground/80">
+                        Last Online:{" "}
+                        {player.lastlogoff
+                          ? new Date(player.lastlogoff * 1000).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="mt-6 text-blue-500 text-center">
-                <Link
-                  to="/updateInfo"
-                  className="text-xs text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium"
-                >
-                  Update Info
-                </Link>
+            </CardBody>
+          </Card>
+          <Card className="text-white border-none bg-background/60 dark:bg-default-100/50">
+            <CardBody>
+              <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
+                <div className="relative col-span-6 md:col-span-4">
+                  <Image
+                    alt="player avatar"
+                    className="object-cover opacity-100"
+                    height={200}
+                    shadow="md"
+                    src={player.avatarfull}
+                    width="100%"
+                  />
+                </div>
+                <div className="flex flex-col col-span-6 md:col-span-8">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col gap-0">
+                      <h1 className="text-large font-medium mt-4">
+                        {player.personaname}
+                      </h1>
+                      <p className="text-small text-foreground/80">
+                        Account Created:{" "}
+                        {player.timecreated
+                          ? new Date(player.timecreated * 1000).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                      <p className="text-small text-foreground/80">
+                        Last Online:{" "}
+                        {player.lastlogoff
+                          ? new Date(player.lastlogoff * 1000).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardBody>
+          </Card>
+          <Card className="text-white border-none bg-background/60 dark:bg-default-100/50">
+            <CardBody>
+              <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
+                <div className="relative col-span-6 md:col-span-4">
+                  <Image
+                    alt="player avatar"
+                    className="object-cover opacity-100"
+                    height={200}
+                    shadow="md"
+                    src={player.avatarfull}
+                    width="100%"
+                  />
+                </div>
+                <div className="flex flex-col col-span-6 md:col-span-8">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col gap-0">
+                      <h1 className="text-large font-medium mt-4">
+                        {player.personaname}
+                      </h1>
+                      <p className="text-small text-foreground/80">
+                        Account Created:{" "}
+                        {player.timecreated
+                          ? new Date(player.timecreated * 1000).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                      <p className="text-small text-foreground/80">
+                        Last Online:{" "}
+                        {player.lastlogoff
+                          ? new Date(player.lastlogoff * 1000).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

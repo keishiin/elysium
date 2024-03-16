@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Divider } from "@nextui-org/react";
 
 function Navbar() {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
 		<div className="bg-blue-500">
-			<nav className="relative py-2 pl-3 pr-4 flex justify-between items-center bg-white">
+			<nav className="relative py-2 pl-3 pr-4 flex justify-between items-center bg-black text-white">
 				<Link to="/" className="text-3xl font-bold leading-none">
 					<span className="h-10">webapp</span>
 				</Link>
@@ -27,15 +28,15 @@ function Navbar() {
 					<li>
 						<Link
 							to="/"
-							className="py-2 pl-3 pr-4 text-black hover:text-blue-500"
+							className="py-2 pl-3 pr-4 text-white hover:text-blue-500"
 						>
 							Home
 						</Link>
 					</li>
 					<li>
 						<Link
-							to="/userProfile"
-							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
+							to="/profile"
+							className="py-2 pl-3 pr-4 text-white hover:text-blue-500"
 						>
 							Profile
 						</Link>
@@ -43,7 +44,7 @@ function Navbar() {
 					<li>
 						<Link
 							to="/psn"
-							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
+							className="py-2 pl-3 pr-4 text-white hover:text-blue-500"
 						>
 							Psn
 						</Link>
@@ -51,7 +52,7 @@ function Navbar() {
 					<li>
 						<Link
 							to="/xbox"
-							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
+							className="py-2 pl-3 pr-4 text-white hover:text-blue-500"
 						>
 							Xbox
 						</Link>
@@ -59,7 +60,7 @@ function Navbar() {
 					<li>
 						<Link
 							to="/steam"
-							className="py-2 pl-3 pr-4 text-black hover:text-gray-500"
+							className="py-2 pl-3 pr-4 text-white hover:text-blue-500"
 						>
 							Steam
 						</Link>
@@ -67,17 +68,18 @@ function Navbar() {
 				</ul>
 				<Link
 					to="/login"
-					className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold  rounded-xl transition duration-200"
+					className="hidden lg:inline-block lg:ml-auto lg:mr-3 py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 text-sm font-bold  rounded-xl transition duration-200"
 				>
 					Sign In
 				</Link>
 				<Link
 					to="/signup"
-					className="hidden lg:inline-block py-2 px-6 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl transition duration-200"
+					className="hidden lg:inline-block py-2 px-6 bg-blue-600 hover:bg-blue-700 text-sm text-white font-bold rounded-xl transition duration-200"
 				>
 					Sign up
 				</Link>
 			</nav>
+			<Divider orientation="horizontal"/>
 			<div
 				className={
 					!isOpen
@@ -86,12 +88,12 @@ function Navbar() {
 				}
 			>
 				<div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
-				<nav className="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-white border-r overflow-y-auto">
+				<nav className="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-black border-r overflow-y-auto">
 					<div className="flex items-center mb-8">
 						<button className="navbar-close">
 							<svg
 								onClick={() => setIsOpen(!isOpen)}
-								className="h-6 w-6 text-gray-400 cursor-pointer hover:text-gray-500"
+								className="h-6 w-6 text-gray-400 cursor-pointer hover:text-blue-600"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
 								viewBox="0 0 24 24"
@@ -111,15 +113,15 @@ function Navbar() {
 							<li className="mb-1">
 								<Link
 									to="/"
-									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
+									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-600 hover:text-blue-50 rounded"
 								>
 									Home
 								</Link>
 							</li>
 							<li className="mb-1">
 								<Link
-									to="/userProfile"
-									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
+									to="/profile"
+									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-600 hover:text-blue-50  rounded"
 								>
 									Profile
 								</Link>
@@ -127,7 +129,7 @@ function Navbar() {
 							<li className="mb-1">
 								<Link
 									to="/psn"
-									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
+									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-600 hover:text-blue-50  rounded"
 								>
 									Psn
 								</Link>
@@ -135,7 +137,7 @@ function Navbar() {
 							<li className="mb-1">
 								<Link
 									to="/xbox"
-									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
+									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-600 hover:text-blue-50  rounded"
 								>
 									Xbox
 								</Link>
@@ -143,7 +145,7 @@ function Navbar() {
 							<li className="mb-1">
 								<Link
 									to="/steam"
-									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded"
+									className="block p-4 text-sm font-semibold text-gray-400 hover:bg-blue-600 hover:text-blue-50  rounded"
 								>
 									Steam
 								</Link>
@@ -154,7 +156,7 @@ function Navbar() {
 						<div className="pt-6">
 							<Link
 								to="/login"
-								className="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-gray-50 hover:bg-gray-100 rounded-xl"
+								className="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl"
 							>
 								Sign in
 							</Link>

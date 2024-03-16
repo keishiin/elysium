@@ -38,13 +38,13 @@ export function Home() {
         {!userId && !token && (
           <>
             <button
-              className="mt-8 w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm"
+              className="w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm"
               onClick={() => nav("/login")}
             >
               Login
             </button>
             <button
-              className="mt-2 w-40 h-10 rounded-xl bg-white text-black border border-black text-sm"
+              className=" mt-8 w-40 h-10 rounded-xl bg-white text-black border border-black text-sm"
               onClick={() => nav("/signup")}
             >
               Signup

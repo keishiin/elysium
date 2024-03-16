@@ -40,6 +40,7 @@ export const get_onwed_games = (cursor: number) => {
     });
 };
 
+
 export default {
     get_player_info,
     get_onwed_games,

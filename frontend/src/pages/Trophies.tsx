@@ -6,7 +6,7 @@ interface TrophiesProps {
 
 function Trophies({ platform }: TrophiesProps) {
   return (
-    <div>
+    <div className="min-h-screen bg-black">
       <Navbar />
       <div>{platform}</div>
     </div>

@@ -2,7 +2,7 @@ use axum::{
     extract::{Query, State},
     Json,
 };
-use hyper::HeaderMap;
+use hyper::{HeaderMap, StatusCode};
 use sea_orm::DatabaseConnection;
 use serde::{Deserialize, Serialize};
 use steam_api_wrapper::{
@@ -22,6 +22,7 @@ pub struct Cursor {
 
 #[derive(Serialize, Deserialize)]
 pub struct SteamOwnedGames {
+    game_count: u32,
     cursor: u32,
     data: Vec<get_owned_games::OwnedGame>,
 }
@@ -47,32 +48,47 @@ pub async fn player_owned_games(
 
     let steam = Steam::new(api_key.as_str());
 
-    let response = steam
+    let response_result = steam
         .get_owned_games(steam_id_to_u64(user.steam_id)?, true, false)
-        .await
-        .unwrap();
+        .await;
 
-    let page: u32;
+    match response_result {
+        Ok(response) => {
+            let page: u32;
 
-    if let Some(cursor) = cursor.cursor {
-        page = cursor;
-    } else {
-        page = 0;
+            if let Some(cursor) = cursor.cursor {
+                page = cursor;
+            } else {
+                page = 0;
+            }
+
+            let next_page = page + 10;
+            let paginated_response;
+
+            eprintln!("MEXT PAGE: {:?}", next_page);
+            eprintln!("PAGE: {:?}", page);
+
+            if response.game_count < next_page {
+                paginated_response =
+                    response.games[page as usize..response.game_count as usize].to_vec();
+            } else {
+                paginated_response = response.games[page as usize..next_page as usize].to_vec();
+            }
+
+            Ok(Json(SteamOwnedGames {
+                game_count: response.game_count,
+                cursor: next_page,
+                data: paginated_response,
+            }))
+        }
+        Err(error) => {
+            eprintln!("error getting the data from the api: {:?}", error);
+            Err(ApiError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "error in api fetch",
+            ))
+        }
     }
-
-    let max_cursor = page + 10;
-    let paginated_response;
-
-    if response.game_count < max_cursor {
-        paginated_response = response.games[page as usize..response.game_count as usize].to_vec();
-    } else {
-        paginated_response = response.games[page as usize..max_cursor as usize].to_vec();
-    }
-
-    Ok(Json(SteamOwnedGames {
-        cursor: max_cursor,
-        data: paginated_response,
-    }))
 }
 
 pub async fn get_player_recently_played_games(
@@ -85,12 +101,20 @@ pub async fn get_player_recently_played_games(
 
     let steam = Steam::new(api_key.as_str());
 
-    let response = steam
+    let response_result = steam
         .get_recently_played_games(steam_id_to_u64(user.steam_id)?)
-        .await
-        .unwrap();
+        .await;
 
-    Ok(Json(RecentlyPlayedGames { response }))
+    match response_result {
+        Ok(response) => Ok(Json(RecentlyPlayedGames { response })),
+        Err(error) => {
+            eprintln!("error getting the data from the api: {:?}", error);
+            Err(ApiError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "error in api fetch",
+            ))
+        }
+    }
 }
 
 pub async fn player_summary(
@@ -103,10 +127,18 @@ pub async fn player_summary(
 
     let steam = Steam::new(api_key.as_str());
 
-    let response = steam
+    let response_result = steam
         .get_player_summaries(steam_id_to_u64(user.steam_id)?)
-        .await
-        .unwrap();
+        .await;
 
-    Ok(Json(PlayerSummary { response }))
+    match response_result {
+        Ok(response) => Ok(Json(PlayerSummary { response })),
+        Err(error) => {
+            eprintln!("error getting the data from the api: {:?}", error);
+            Err(ApiError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "error in api fetch",
+            ))
+        }
+    }
 }

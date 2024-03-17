@@ -1,12 +1,10 @@
-import defaultTheme from "tailwindcss/defaultTheme";
- 
-import colors from "tailwindcss/colors";
+import {nextui} from "@nextui-org/react";
 import { default as flattenColorPalette } from "tailwindcss/lib/util/flattenColorPalette";
 
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}",],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}",     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       boxShadow: {
@@ -14,7 +12,8 @@ export default {
       },
     },
   },
-  plugins: [addVariablesForColors],
+  darkMode: "class",
+  plugins: [addVariablesForColors, nextui()],
 }
 
 function addVariablesForColors({ addBase, theme }: any) {

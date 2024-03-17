@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./index.css";
+import "./globals.css";
 import { Home } from "./pages/Home.tsx";
 import SignIn from "./pages/SignIn.tsx";
 import SignUp from "./pages/SignUp.tsx";
@@ -11,6 +11,7 @@ import Trophies from "./pages/Trophies.tsx";
 import { QueryClient, QueryClientProvider } from "react-query";
 import UpdateUserInfo from "./pages/UpdateUserInfo.tsx";
 import Steam from "./pages/Steam.tsx";
+import {NextUIProvider} from '@nextui-org/react'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,7 +64,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <NextUIProvider>
+        <RouterProvider router={router} />
+      </NextUIProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

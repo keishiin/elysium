@@ -61,3 +61,8 @@ interface Steam {
   data: Game[],
   cursor: number
 }
+
+interface ModalUpdateProps {
+  isOpen: boolean;
+  onClose: () => void;
+}

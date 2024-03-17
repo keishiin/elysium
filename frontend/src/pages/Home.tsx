@@ -32,7 +32,7 @@ export function Home() {
         />
       </div>
       <h1 className="md:text-7xl text-3xl lg:text-6xl font-bold text-center text-white relative z-20">
-        Web<text className="text-blue-500 dark:text-blue-500">app</text>
+        Ely<text className="text-blue-500 dark:text-blue-500">sium</text>
       </h1>
       <div className="z-20 mt-8 flex flex-col md:flex-row space-y-5 md:space-y-0 space-x-0 md:space-x-4">
         {!userId && !token && (

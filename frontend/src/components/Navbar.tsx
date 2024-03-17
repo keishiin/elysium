@@ -9,7 +9,7 @@ function Navbar() {
 		<div className="bg-blue-500">
 			<nav className="relative py-2 pl-3 pr-4 flex justify-between items-center bg-gray-900 text-white">
 				<Link to="/" className="text-3xl font-bold leading-none">
-					<span className="h-10">webapp</span>
+					<span className="h-10">Elysium</span>
 				</Link>
 				<div className="lg:hidden">
 					<button className="navbar-burger flex items-center text-blue-600 p-3">

@@ -55,3 +55,9 @@ interface Game {
   img_logo_url?: string;
   has_community_visible_stats?: boolean;
 }
+
+interface Steam {
+  game_count: number,
+  data: Game[],
+  cursor: number
+}

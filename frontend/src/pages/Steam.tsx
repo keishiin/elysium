@@ -1,9 +1,8 @@
-'use client';
+"use client";
 import ErrorComponent from "../components/ErrorComponent";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import {
-    Avatar,
     Table,
     TableHeader,
     TableColumn,
@@ -20,14 +19,14 @@ import apiClient from "../services/api-common";
 
 function Steam() {
     const [page, setPage] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
+    const [pages, setPages] = useState(1);
     const [data, setData] = useState<Steam>({
         cursor: 0,
         data: [],
         game_count: 0,
     });
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
-    const [pages, setPages] = useState(1);
 
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("user");
@@ -37,9 +36,10 @@ function Steam() {
             setIsLoading(true);
             setIsError(false);
             try {
+                const offset = (page - 1) * 10;
                 let url = `steam/games`;
                 if (page > 0) {
-                    url = `steam/games?cursor=${page}`;
+                    url = `steam/games?cursor=${offset}`;
                 }
                 const response = await apiClient.get(url, {
                     headers: {
@@ -48,7 +48,7 @@ function Steam() {
                     },
                 });
                 setData(response.data);
-                setPages(Math.ceil(response.data.game_count / 10))
+                setPages(Math.ceil(response.data.game_count / 10));
             } catch (error) {
                 setIsError(true);
             }
@@ -97,11 +97,9 @@ function Steam() {
                             {(game) => (
                                 <TableRow key={game?.appid}>
                                     <TableCell>
-                                        <Avatar
-                                            isBordered
-                                            className="opacity-100 z-100"
+                                        <img
                                             src={`${IMAGE_URL_BASE}/${game.appid}/${game.img_icon_url}.jpg`}
-                                        ></Avatar>
+                                        />
                                     </TableCell>
                                     <TableCell>{game.name}</TableCell>
                                     <TableCell>

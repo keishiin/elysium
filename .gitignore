@@ -9,6 +9,9 @@
 /frontend/dist
 /frontend/dist-ssr
 /frontend/*.local
+/frontend/.next/
+/frontend/out/
+/frontend/.vscode
 
 # Logs
 logs

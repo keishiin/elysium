@@ -1,7 +1,6 @@
 import apiClient from "./api-common";
 import { useState } from "react";
 
-
 export const get_player_info = async () => {
     const [token] = useState(localStorage.getItem("token"));
     const [userId] = useState(localStorage.getItem("user"));
@@ -13,7 +12,6 @@ export const get_player_info = async () => {
         },
     });
     return response.data;
-    
 };
 
 export default {

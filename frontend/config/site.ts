@@ -23,7 +23,7 @@ export const siteConfig = {
 		{
 			label: "Steam",
 			href: "/steam",
-		}
+		},
 	],
 	navMenuItems: [
 		{
@@ -36,19 +36,19 @@ export const siteConfig = {
 		},
 		{
 			label: "Psn",
-			href: "/pricing",
+			href: "/psn",
 		},
 		{
 			label: "Xbox",
-			href: "/blog",
+			href: "/xbox",
 		},
 		{
 			label: "Steam",
 			href: "/steam",
-		}
+		},
 	],
 	links: {
 		github: "https://github.com/keishiin/elysium/tree/react-to-nextjs",
-    sponsor: "https://patreon.com/jrgarciadev"
+		sponsor: "https://patreon.com/jrgarciadev",
 	},
 };

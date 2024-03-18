@@ -5,6 +5,7 @@ import { Card, CardBody } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import apiClient from "@/services/api-common";
 import Laoding from "@/components/laoding";
+import ErrorPage from "@/components/error";
 
 function Profile() {
   const [player, setPlayer] = useState<PlayerInfo | null>(null);
@@ -24,29 +25,34 @@ function Profile() {
         });
         const playerData = response.data["response"][0];
         setPlayer(playerData);
-		setIsLoading(false)
-		setIsError(false)
+        setIsLoading(false);
+        setIsError(false);
       } catch (error: any) {
-		setIsError(true)
-		if (error.message == "Request failed with status code 401") {
-			localStorage.removeItem("user");
-			localStorage.removeItem("token");
-		}
+        setIsError(true);
+        setIsLoading(false);
+        if (error.message == "Request failed with status code 401") {
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+        }
         console.error("Error fetching player info:", error);
       }
     };
 
     fetchPlayerInfo();
-  }, [isLoading]); 
+  }, [isLoading]);
 
   if (isLoading) {
-    return <Laoding />; 
+    return <Laoding />;
+  }
+
+  if (isError) {
+    return <ErrorPage />;
   }
 
   return (
     <div className="h-screen flex flex-col items-center">
       <div className="max-w-[610px] w-full">
-        <Card className="text-white border-none bg-background/60 dark:bg-default-100/50">
+        <Card className="border-none bg-background/60 dark:bg-default-100/50">
           <CardBody>
             <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
               <div className="relative col-span-6 md:col-span-4">

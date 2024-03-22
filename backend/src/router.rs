@@ -25,7 +25,10 @@ use tower_http::{cors::CorsLayer, trace::TraceLayer};
 pub fn create_router(state: AppState) -> Router {
     let cors: CorsLayer = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PUT])
-        .allow_origin(["http://127.0.0.1:3000".parse().unwrap()])
+        .allow_origin([
+            "http://127.0.0.1:3000".parse().unwrap(),
+            "http://localhost:3000".parse().unwrap(),
+        ])
         .allow_headers([
             AUTHORIZATION,
             CONTENT_TYPE,

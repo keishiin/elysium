@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<CustomError | null>(null);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const postData = async (event: any) => {
@@ -22,21 +22,15 @@ export default function LoginPage() {
     const passwordValue = passwordRef.current?.value || "";
 
     try {
-      const response = await apiClient.post("auth/signin", {
+      await apiClient.post("auth/signin", {
         username: usernameValue,
         password: passwordValue,
       });
 
-      const customHeader = response.headers["authorization"];
-      const customHeader2 = response.headers["axum-accountid"];
-
-      localStorage.setItem("token", customHeader);
-      localStorage.setItem("user", customHeader2);
-
       router.push("/profile");
     } catch (err) {
       console.log(err);
-      setError((err as any).response.data as CustomError);
+      setError("Unable to sign in");
     }
   };
   return (
@@ -54,7 +48,7 @@ export default function LoginPage() {
         </h2>
         {error && (
           <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-            {error.error}
+            {error}
           </p>
         )}
         <form className="my-8" onSubmit={postData}>

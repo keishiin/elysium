@@ -13,7 +13,6 @@ import {
 } from "@nextui-org/table";
 import { useState, useEffect } from "react";
 import { Pagination } from "@nextui-org/pagination";
-import { Card, CardBody } from "@nextui-org/card";
 
 export default function DocsPage() {
     const [page, setPage] = useState(0);
@@ -61,11 +60,6 @@ export default function DocsPage() {
     return (
         <div>
             <div className="flex flex-col justify-center items-center min-h-screen w-full">
-                <Card>
-                    <CardBody>
-                        <p>Make beautiful websites regardless of your design experience.</p>
-                    </CardBody>
-                </Card>
                 {!isLoading && !isError && (
                     <Table
                         aria-label="Example table with client async pagination"

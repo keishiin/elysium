@@ -1,12 +1,18 @@
 use axum::{
     extract::{Query, State},
+    http::response,
     Json,
 };
 use hyper::{HeaderMap, StatusCode};
 use sea_orm::DatabaseConnection;
 use serde::{Deserialize, Serialize};
 use steam_api_wrapper::{
-    services::{get_owned_games, get_player_info, get_recently_played_games},
+    services::{
+        get_owned_games,
+        get_player_achievements::{PlayerAchievementInfo, PlayerStats},
+        get_player_info, get_recently_played_games,
+        get_schema_for_game::Root,
+    },
     Steam,
 };
 
@@ -133,6 +139,60 @@ pub async fn player_summary(
 
     match response_result {
         Ok(response) => Ok(Json(PlayerSummary { response })),
+        Err(error) => {
+            eprintln!("error getting the data from the api: {:?}", error);
+            Err(ApiError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "error in api fetch",
+            ))
+        }
+    }
+}
+
+pub async fn get_game_achievments_schema(
+    State(api_key): State<String>,
+    headers: HeaderMap,
+) -> Result<Json<Root>, ApiError> {
+    let app_id = get_header(headers, "axum-appid".to_string())?;
+
+    let steam = Steam::new(api_key.as_str());
+
+    let response_result = steam
+        .get_schema_for_game(app_id.parse::<u32>().unwrap())
+        .await;
+
+    match response_result {
+        Ok(response) => Ok(Json(response)),
+        Err(error) => {
+            eprintln!("error getting the data from the api: {:?}", error);
+            Err(ApiError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "error in api fetch",
+            ))
+        }
+    }
+}
+
+pub async fn get_player_ahcievements_for_game(
+    State(db): State<DatabaseConnection>,
+    State(api_key): State<String>,
+    headers: HeaderMap,
+) -> Result<Json<PlayerAchievementInfo>, ApiError> {
+    let user_id = get_header(headers.clone(), "axum-accountId".to_string())?;
+    let app_id = get_header(headers, "axum-appid".to_string())?;
+    let user = get_user_by_id(&db, user_id).await?;
+
+    let steam = Steam::new(api_key.as_str());
+
+    let response_result = steam
+        .get_player_achievements(
+            steam_id_to_u64(user.steam_id)?,
+            app_id.parse::<u64>().unwrap(),
+        )
+        .await;
+
+    match response_result {
+        Ok(response) => Ok(Json(response)),
         Err(error) => {
             eprintln!("error getting the data from the api: {:?}", error);
             Err(ApiError::new(

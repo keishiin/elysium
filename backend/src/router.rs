@@ -2,7 +2,10 @@ use crate::{
     api::{
         api::{fallback, healthcheck, index, root},
         auth::{signin, signout, signup},
-        steam::{get_player_recently_played_games, player_owned_games, player_summary},
+        steam::{
+            get_game_achievments_schema, get_player_ahcievements_for_game,
+            get_player_recently_played_games, player_owned_games, player_summary,
+        },
         users::{get_user, update_psn_id, update_steam_id, update_xbox_id},
     },
     app_state::AppState,
@@ -27,10 +30,12 @@ pub fn create_router(state: AppState) -> Router {
             AUTHORIZATION,
             CONTENT_TYPE,
             "axum-accountId".parse().unwrap(),
+            "axum-appid".parse().unwrap(),
         ])
         .expose_headers([
             "authorization".parse().unwrap(),
             "axum-accountId".parse().unwrap(),
+            "axum-appid".parse().unwrap(),
         ])
         .allow_credentials(true);
 
@@ -41,6 +46,11 @@ pub fn create_router(state: AppState) -> Router {
         .route("/users/steam_id", put(update_steam_id))
         .route("/steam/games", get(player_owned_games))
         .route("/steam/player-profile", get(player_summary))
+        .route("/steam/game-schema", get(get_game_achievments_schema))
+        .route(
+            "/steam/game-achievements",
+            get(get_player_ahcievements_for_game),
+        )
         .route(
             "/steam/recently-played",
             get(get_player_recently_played_games),

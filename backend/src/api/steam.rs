@@ -1,6 +1,5 @@
 use axum::{
     extract::{Query, State},
-    http::response,
     Json,
 };
 use hyper::{HeaderMap, StatusCode};
@@ -8,10 +7,8 @@ use sea_orm::DatabaseConnection;
 use serde::{Deserialize, Serialize};
 use steam_api_wrapper::{
     services::{
-        get_owned_games,
-        get_player_achievements::{PlayerAchievementInfo, PlayerStats},
-        get_player_info, get_recently_played_games,
-        get_schema_for_game::Root,
+        get_owned_games, get_player_achievements::PlayerAchievementInfo, get_player_info,
+        get_recently_played_games, get_schema_for_game::Root,
     },
     Steam,
 };

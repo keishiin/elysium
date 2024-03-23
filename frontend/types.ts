@@ -82,3 +82,12 @@ interface GameInfo {
   img_icon_url: string;
   img_logo_url: string | null;
 }
+
+interface AxumUser {
+  email: string;
+  id: string;
+  psn_id: string;
+  steam_id: string;
+  username: string;
+  xbox_id: string;
+}

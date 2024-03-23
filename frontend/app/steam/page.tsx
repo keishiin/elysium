@@ -91,7 +91,11 @@ export default function DocsPage() {
                             loadingState={isLoading ? "loading" : "idle"}
                         >
                             {(game) => (
-                                <TableRow key={game?.appid}>
+                                <TableRow
+                                    key={game?.appid}
+                                    className="cursor-pointer"
+                                    onClick={() => console.log(game?.appid)}
+                                >
                                     <TableCell>
                                         <img
                                             src={`${IMAGE_URL_BASE}/${game.appid}/${game.img_icon_url}.jpg`}

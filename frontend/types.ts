@@ -91,3 +91,37 @@ interface AxumUser {
   username: string;
   xbox_id: string;
 }
+
+interface GameStatsResponse {
+  gameName: string;
+  gameVersion: string;
+  availableGameStats: {
+    achievements: Achievement[];
+  };
+}
+
+interface Achievement {
+  name: string;
+  defaultValue: number;
+  displayName: string;
+  hidden: number;
+  description: string;
+  icon: string;
+  iconGray: string;
+}
+
+interface PlayerAchievement {
+  apiname: string;
+  achieved: number;
+  name: string | null;
+  description: string | null;
+  unlocktime: number;
+}
+
+interface GameAchievementsResponse {
+  gameName: string;
+  steamID: string;
+  achievements:  PlayerAchievement[];
+  success: boolean;
+  error: string | null;
+}

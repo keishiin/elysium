@@ -158,12 +158,14 @@ function Profile() {
                       SteamId: {axumUser?.steam_id}
                     </p>
                   </div>
-                  <Button className="px-2" color="primary" onPress={onOpen}>
-                    Update SteamId
-                  </Button>
-                  <Button className="px-2" color="primary" onPress={signout}>
-                    Signout
-                  </Button>
+                  <div className="flex flex-row">
+                    <Button className="mx-4" color="primary" onPress={onOpen}>
+                      Update SteamId
+                    </Button>
+                    <Button className="mx-4" color="primary" onPress={signout}>
+                      Signout
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -271,7 +273,7 @@ function Profile() {
                   Close
                 </Button>
                 <Button color="primary" onPress={updateInfo}>
-                  Action
+                  Update
                 </Button>
               </ModalFooter>
             </>

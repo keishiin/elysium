@@ -13,17 +13,33 @@ import {
 } from "@nextui-org/table";
 import { useState, useEffect } from "react";
 import { Pagination } from "@nextui-org/pagination";
+import { Button } from "@nextui-org/button";
+import {
+    useDisclosure,
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+} from "@nextui-org/react";
 
 export default function DocsPage() {
     const [page, setPage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
+    const [modelError, setModelError] = useState(false);
+    const [error, setError] = useState("");
     const [pages, setPages] = useState(1);
+    const [gameSchema, setGameSchema] = useState<GameStatsResponse>();
+    const [playerAchievments, setPlayerAchievements] = useState<GameAchievementsResponse>();
+    const [achievements, setAchievements] = useState<Achievement[]>();
     const [data, setData] = useState<Steam>({
         cursor: 0,
         data: [],
         game_count: 0,
     });
+    
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("user");
@@ -46,6 +62,7 @@ export default function DocsPage() {
                         Authorization: token,
                     },
                 });
+                
                 setData(response.data);
                 setPages(Math.ceil(response.data.game_count / 10));
             } catch (error) {
@@ -56,6 +73,38 @@ export default function DocsPage() {
 
         fetchData();
     }, [page, token, userId]);
+
+    const handleMoreInfo = async (gameId: string) => {
+        try {
+
+            const [gameSchemaResponse, playerGameAchievmentsResponse] = await Promise.all([
+
+              apiClient.get("steam/game-schema", {
+                headers: {
+                    "axum-accountId": userId,
+                    "axum-appid": gameId,
+                    Authorization: token,
+                },
+            }),
+              apiClient.get(`steam/game-achievements`, {
+                headers: {
+                    "axum-accountId": userId,
+                    "axum-appid": gameId,
+                    Authorization: token,
+                },
+              }),
+            ]);
+            setGameSchema(gameSchemaResponse.data.game);
+            setPlayerAchievements(playerGameAchievmentsResponse.data);
+            setAchievements(gameSchemaResponse.data.game.availableGameStats.achievements);
+            console.log(achievements)
+            setModelError(false)
+        } catch (error) {
+            setError("a error occured");
+            setModelError(true)
+            console.log(error)
+        }
+      };
 
     return (
         <div>
@@ -84,6 +133,7 @@ export default function DocsPage() {
                             <TableColumn key="name">Name</TableColumn>
                             <TableColumn key="playtime_2weeks">Recently Played</TableColumn>
                             <TableColumn key="playtime_forever">Total Time</TableColumn>
+                            <TableColumn key="More Info">Total Time</TableColumn>
                         </TableHeader>
                         <TableBody
                             items={data.data}
@@ -93,8 +143,6 @@ export default function DocsPage() {
                             {(game) => (
                                 <TableRow
                                     key={game?.appid}
-                                    className="cursor-pointer"
-                                    onClick={() => console.log(game?.appid)}
                                 >
                                     <TableCell>
                                         <img
@@ -112,12 +160,41 @@ export default function DocsPage() {
                                             ? `${timeConversion(game.playtime_forever)} hrs`
                                             : "0 hrs"}
                                     </TableCell>
+                                    <TableCell>
+                                        <Button onClick={() => handleMoreInfo(game.appid.toString())} onPress={onOpen}>More Info</Button>
+                                    </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
                 )}
             </div>
+            <Modal size="full" isOpen={isOpen} onOpenChange={onOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">
+                                {playerAchievments?.gameName ? playerAchievments?.gameName : gameSchema?.gameName}
+                            </ModalHeader>
+                            <ModalBody>
+                                {error && (
+                                    <h1 color="danger" className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+                                        {error}
+                                    </h1>
+                                )}
+                                {gameSchema?.availableGameStats.achievements.map((achi) => {
+                                   return <p>{achi.displayName}</p>
+                                })}
+                            </ModalBody> 
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

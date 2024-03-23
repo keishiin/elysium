@@ -11,8 +11,8 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="h-full relative w-ful flex flex-col items-center justify-center overflow-hidden rounded-md">
-      <div className="w-full h-full absolute inset-0">
+    <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden rounded-md">
+      <div className="w-full h-screen absolute inset-0">
         <SparklesCore
           id="tsparticlesfullpage"
           background="transparent"
@@ -20,7 +20,7 @@ export default function Home() {
           maxSize={1.4}
           particleDensity={100}
           className="absolute inset-0 z-0"
-          particleColor="#FFFFFF"
+          particleColor="#04CAF7"
         />
       </div>
       <h1 className="md:text-7xl text-3xl lg:text-6xl font-bold text-center text-blue-500 dark:text-blue-500 relative z-20">

@@ -27,12 +27,12 @@ import { useEffect } from "react";
 
 export const Navbar = () => {
 	let token;
-	let userId; 
+	let userId;
 
 	useEffect(() => {
 		token = localStorage.getItem("token");
 		userId = localStorage.getItem("user");
-	}, [])
+	}, []);
 
 	const handleSignout = () => {
 		localStorage.removeItem("user");

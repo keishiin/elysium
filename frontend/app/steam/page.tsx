@@ -30,14 +30,15 @@ export default function DocsPage() {
     const [error, setError] = useState("");
     const [pages, setPages] = useState(1);
     const [gameSchema, setGameSchema] = useState<GameStatsResponse>();
-    const [playerAchievments, setPlayerAchievements] = useState<GameAchievementsResponse>();
+    const [playerAchievments, setPlayerAchievements] =
+        useState<GameAchievementsResponse>();
     const [achievements, setAchievements] = useState<Achievement[]>();
     const [data, setData] = useState<Steam>({
         cursor: 0,
         data: [],
         game_count: 0,
     });
-    
+
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const token = localStorage.getItem("token");
@@ -61,7 +62,7 @@ export default function DocsPage() {
                         Authorization: token,
                     },
                 });
-                
+
                 setData(response.data);
                 setPages(Math.ceil(response.data.game_count / 10));
             } catch (error: any) {
@@ -69,7 +70,7 @@ export default function DocsPage() {
                 if (error.message == "Request failed with status code 401") {
                     localStorage.removeItem("user");
                     localStorage.removeItem("token");
-                  }
+                }
             }
             setIsLoading(false);
         };
@@ -79,33 +80,34 @@ export default function DocsPage() {
 
     const handleMoreInfo = async (gameId: string) => {
         try {
-
-            const [gameSchemaResponse, playerGameAchievmentsResponse] = await Promise.all([
-
-              apiClient.get("steam/game-schema", {
-                headers: {
-                    "axum-accountId": userId,
-                    "axum-appid": gameId,
-                    Authorization: token,
-                },
-            }),
-              apiClient.get(`steam/game-achievements`, {
-                headers: {
-                    "axum-accountId": userId,
-                    "axum-appid": gameId,
-                    Authorization: token,
-                },
-              }),
-            ]);
+            const [gameSchemaResponse, playerGameAchievmentsResponse] =
+                await Promise.all([
+                    apiClient.get("steam/game-schema", {
+                        headers: {
+                            "axum-accountId": userId,
+                            "axum-appid": gameId,
+                            Authorization: token,
+                        },
+                    }),
+                    apiClient.get(`steam/game-achievements`, {
+                        headers: {
+                            "axum-accountId": userId,
+                            "axum-appid": gameId,
+                            Authorization: token,
+                        },
+                    }),
+                ]);
             setGameSchema(gameSchemaResponse.data.game);
             setPlayerAchievements(playerGameAchievmentsResponse.data);
-            setAchievements(gameSchemaResponse.data.game.availableGameStats.achievements);
-            console.log(achievements)
+            setAchievements(
+                gameSchemaResponse.data.game.availableGameStats.achievements,
+            );
+            console.log(achievements);
         } catch (error) {
             setError("a error occured");
-            console.log(error)
+            console.log(error);
         }
-      };
+    };
 
     return (
         <div>
@@ -143,9 +145,7 @@ export default function DocsPage() {
                             emptyContent={"Player profile is not public"}
                         >
                             {(game) => (
-                                <TableRow
-                                    key={game?.appid}
-                                >
+                                <TableRow key={game?.appid}>
                                     <TableCell>
                                         <img
                                             src={`${IMAGE_URL_BASE}/${game.appid}/${game.img_icon_url}.jpg`}
@@ -163,7 +163,12 @@ export default function DocsPage() {
                                             : "0 hrs"}
                                     </TableCell>
                                     <TableCell>
-                                        <Button onClick={() => handleMoreInfo(game.appid.toString())} onPress={onOpen}>More Info</Button>
+                                        <Button
+                                            onClick={() => handleMoreInfo(game.appid.toString())}
+                                            onPress={onOpen}
+                                        >
+                                            More Info
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -176,44 +181,60 @@ export default function DocsPage() {
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">
-                                {playerAchievments?.gameName ? playerAchievments?.gameName : gameSchema?.gameName}
+                                {playerAchievments?.gameName
+                                    ? playerAchievments?.gameName
+                                    : gameSchema?.gameName}
                             </ModalHeader>
                             <ModalBody className="overflow-auto">
                                 {error && (
-                                    <h1 color="danger" className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+                                    <h1
+                                        color="danger"
+                                        className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                                    >
                                         {error}
                                     </h1>
                                 )}
-                                {gameSchema?.availableGameStats.achievements.map((achi, index) => {
-                                   return (
-                                    <div key={index} className="hover:bg-primary-50 cursor-pointer flex justify-between">
-                                        <div className="flex flex-row">
-                                        <img src={achi.icon}></img>
-                                            <div className="ml-5 flex flex-col gap-1 items-start justify-center">
-                                                <p  className="font-semibold text-default-400">
-                                                    {achi.displayName}
-                                                </p>
-                                                <p className="text-default-400 text-small">
-                                                    {achi.description}
-                                                </p>
+                                {gameSchema?.availableGameStats.achievements.map(
+                                    (achi, index) => {
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="hover:bg-primary-50 cursor-pointer flex justify-between"
+                                            >
+                                                <div className="flex flex-row">
+                                                    <img src={achi.icon}></img>
+                                                    <div className="ml-5 flex flex-col gap-1 items-start justify-center">
+                                                        <p className="font-semibold text-default-400">
+                                                            {achi.displayName}
+                                                        </p>
+                                                        <p className="text-default-400 text-small">
+                                                            {achi.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col text-right">
+                                                    <p>
+                                                        Achieved:{" "}
+                                                        {playerAchievments?.achievements[index].achieved ===
+                                                            1
+                                                            ? "true"
+                                                            : "false"}
+                                                    </p>
+                                                    <p>
+                                                        Unlocked at:{" "}
+                                                        {playerAchievments?.achievements[index].unlocktime
+                                                            ? new Date(
+                                                                playerAchievments?.achievements[index]
+                                                                    .unlocktime * 1000,
+                                                            ).toLocaleString()
+                                                            : ""}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col text-right">
-                                           <p>
-                                             Achieved: {" "}
-                                                {playerAchievments?.achievements[index].achieved === 1 ? "true" : "false"}
-                                           </p>
-                                           <p>
-                                            Unlocked at: {" "}
-                                               {playerAchievments?.achievements[index].unlocktime
-                                                ? new Date(playerAchievments?.achievements[index].unlocktime * 1000).toLocaleString()
-                                                : ""}
-                                           </p>
-                                        </div>
-                                    </div>
-                                   )
-                                })}
-                            </ModalBody> 
+                                        );
+                                    },
+                                )}
+                            </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="light" onPress={onClose}>
                                     Close

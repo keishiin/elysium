@@ -1,9 +1,11 @@
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+export default function UserLayout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
 	return (
 		<section>
-			<div>
-				{children}
-			</div>
+			<div>{children}</div>
 		</section>
 	);
 }

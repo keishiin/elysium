@@ -68,7 +68,7 @@ function Profile() {
           localStorage.removeItem("user");
           localStorage.removeItem("token");
         }
-        setError("error")
+        setError("error");
         console.error("Error fetching player info:", error);
       }
     };
@@ -84,7 +84,6 @@ function Profile() {
     return <ErrorPage />;
   }
 
-
   return (
     <div className="h-screen flex flex-col items-center">
       <div className="max-w-[610px] w-full">
@@ -93,7 +92,7 @@ function Profile() {
             {error}
           </p>
         )}
-                <Card className="mt-10 border-none bg-background/60 dark:bg-default-100/50">
+        <Card className="mt-10 border-none bg-background/60 dark:bg-default-100/50">
           <CardBody>
             <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
               <div className="relative col-span-6 md:col-span-4">
@@ -140,7 +139,10 @@ function Profile() {
               <TableColumn key="playtime_2weeks">Recently Played</TableColumn>
               <TableColumn key="playtime_forever">Total Time</TableColumn>
             </TableHeader>
-            <TableBody items={recentlyPlayed} emptyContent={"Player profile issue"}>
+            <TableBody
+              items={recentlyPlayed}
+              emptyContent={"Player profile issue"}
+            >
               {(game) => (
                 <TableRow key={game.appid}>
                   <TableCell>

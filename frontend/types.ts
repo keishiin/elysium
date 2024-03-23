@@ -121,7 +121,7 @@ interface PlayerAchievement {
 interface GameAchievementsResponse {
   gameName: string;
   steamID: string;
-  achievements:  PlayerAchievement[];
+  achievements: PlayerAchievement[];
   success: boolean;
   error: string | null;
 }

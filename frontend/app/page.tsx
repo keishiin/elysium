@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [token] = useState(localStorage.getItem("token"));
-  const [userId] = useState(localStorage.getItem("user"));
+  const [token] = useState(window.localStorage.getItem("token"));
+  const [userId] = useState(window.localStorage.getItem("user"));
   const router = useRouter();
 
   return (

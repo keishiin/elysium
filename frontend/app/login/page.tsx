@@ -27,7 +27,7 @@ export default function LoginPage() {
         password: passwordValue,
       });
 
-      router.push("/profile");
+      router.push("/user");
     } catch (err) {
       console.log(err);
       setError("Unable to sign in");

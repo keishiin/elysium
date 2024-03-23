@@ -27,7 +27,6 @@ export default function DocsPage() {
     const [page, setPage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
-    const [modelError, setModelError] = useState(false);
     const [error, setError] = useState("");
     const [pages, setPages] = useState(1);
     const [gameSchema, setGameSchema] = useState<GameStatsResponse>();
@@ -65,8 +64,12 @@ export default function DocsPage() {
                 
                 setData(response.data);
                 setPages(Math.ceil(response.data.game_count / 10));
-            } catch (error) {
+            } catch (error: any) {
                 setIsError(true);
+                if (error.message == "Request failed with status code 401") {
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("token");
+                  }
             }
             setIsLoading(false);
         };
@@ -98,10 +101,8 @@ export default function DocsPage() {
             setPlayerAchievements(playerGameAchievmentsResponse.data);
             setAchievements(gameSchemaResponse.data.game.availableGameStats.achievements);
             console.log(achievements)
-            setModelError(false)
         } catch (error) {
             setError("a error occured");
-            setModelError(true)
             console.log(error)
         }
       };
@@ -139,6 +140,7 @@ export default function DocsPage() {
                             items={data.data}
                             loadingContent={<Loading />}
                             loadingState={isLoading ? "loading" : "idle"}
+                            emptyContent={"Player profile is not public"}
                         >
                             {(game) => (
                                 <TableRow
@@ -176,14 +178,40 @@ export default function DocsPage() {
                             <ModalHeader className="flex flex-col gap-1">
                                 {playerAchievments?.gameName ? playerAchievments?.gameName : gameSchema?.gameName}
                             </ModalHeader>
-                            <ModalBody>
+                            <ModalBody className="overflow-auto">
                                 {error && (
                                     <h1 color="danger" className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
                                         {error}
                                     </h1>
                                 )}
-                                {gameSchema?.availableGameStats.achievements.map((achi) => {
-                                   return <p>{achi.displayName}</p>
+                                {gameSchema?.availableGameStats.achievements.map((achi, index) => {
+                                   return (
+                                    <div key={index} className="hover:bg-primary-50 cursor-pointer flex justify-between">
+                                        <div className="flex flex-row">
+                                        <img src={achi.icon}></img>
+                                            <div className="ml-5 flex flex-col gap-1 items-start justify-center">
+                                                <p  className="font-semibold text-default-400">
+                                                    {achi.displayName}
+                                                </p>
+                                                <p className="text-default-400 text-small">
+                                                    {achi.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col text-right">
+                                           <p>
+                                             Achieved: {" "}
+                                                {playerAchievments?.achievements[index].achieved === 1 ? "true" : "false"}
+                                           </p>
+                                           <p>
+                                            Unlocked at: {" "}
+                                               {playerAchievments?.achievements[index].unlocktime
+                                                ? new Date(playerAchievments?.achievements[index].unlocktime * 1000).toLocaleString()
+                                                : ""}
+                                           </p>
+                                        </div>
+                                    </div>
+                                   )
                                 })}
                             </ModalBody> 
                             <ModalFooter>

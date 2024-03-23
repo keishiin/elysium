@@ -1,32 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Card, CardBody } from "@nextui-org/card";
-import { Image } from "@nextui-org/image";
+import { useEffect, useState } from "react";
 import apiClient from "@/services/api-common";
+import { Image } from "@nextui-org/image";
 import Laoding from "@/components/laoding";
 import ErrorPage from "@/components/error";
 import {
-  Button,
-  Input,
+  Card,
+  CardBody,
   Link,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
   TableRow,
-  useDisclosure,
 } from "@nextui-org/react";
 import { timeConversion } from "@/utils/time";
-import { LabelInputContainer } from "@/components/ui/label-input-container";
-import { Label } from "@radix-ui/react-label";
-import { useRouter } from "next/navigation";
 
 function Profile() {
   const [player, setPlayer] = useState<PlayerInfo | null>(null);
@@ -34,11 +24,7 @@ function Profile() {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [url, setUrl] = useState("");
-  const [axumUser, setAxumUser] = useState<AxumUser>();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const steamIdRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
-  const router = useRouter();
   const IMAGE_URL_BASE =
     "http://media.steampowered.com/steamcommunity/public/images/apps";
 
@@ -72,7 +58,6 @@ function Profile() {
         const playerData = profileResponse.data["response"][0];
         setRecentlyPlayed(recentlyPlayedResponse["data"]["response"]["games"]);
         setPlayer(playerData);
-        setAxumUser(userInfo["data"]);
         setUrl(`https://steamcommunity.com/profiles/${player?.steamid}/`);
         setIsLoading(false);
         setIsError(false);
@@ -83,6 +68,7 @@ function Profile() {
           localStorage.removeItem("user");
           localStorage.removeItem("token");
         }
+        setError("error")
         console.error("Error fetching player info:", error);
       }
     };
@@ -98,40 +84,6 @@ function Profile() {
     return <ErrorPage />;
   }
 
-  const updateInfo = async (event: any) => {
-    event.preventDefault();
-    const steamIdValue = steamIdRef.current?.value || "";
-
-    if (steamIdValue.length < 1) {
-      setError("steam id cant be empty");
-      return;
-    }
-
-    try {
-      await apiClient.put(
-        `users/steam`,
-        {
-          steam_id: steamIdValue,
-        },
-        {
-          headers: {
-            "axum-accountId": localStorage.getItem("user"),
-            Authorization: localStorage.getItem("token"),
-          },
-        },
-      );
-    } catch (err) {
-      console.log(err);
-      setError("Unable to sign in");
-    }
-  };
-
-  const signout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-
-    router.push("/");
-  };
 
   return (
     <div className="h-screen flex flex-col items-center">
@@ -141,37 +93,7 @@ function Profile() {
             {error}
           </p>
         )}
-        <Card className="mt-10 border-none bg-background/60 dark:bg-default-100/50">
-          <CardBody>
-            <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
-              <div className="flex flex-col col-span-6 md:col-span-8">
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col gap-0">
-                    <h1 className="text-large font-medium mt-4">
-                      Username: {axumUser?.username}
-                    </h1>
-                    <p className="text-small text-foreground/80"></p>
-                    <p className="text-small text-foreground/80">
-                      Email: {axumUser?.email}
-                    </p>
-                    <p className="text-small text-foreground/80">
-                      SteamId: {axumUser?.steam_id}
-                    </p>
-                  </div>
-                  <div className="flex flex-row">
-                    <Button className="mx-4" color="primary" onPress={onOpen}>
-                      Update SteamId
-                    </Button>
-                    <Button className="mx-4" color="primary" onPress={signout}>
-                      Signout
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="mt-10 border-none bg-background/60 dark:bg-default-100/50">
+                <Card className="mt-10 border-none bg-background/60 dark:bg-default-100/50">
           <CardBody>
             <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
               <div className="relative col-span-6 md:col-span-4">
@@ -218,7 +140,7 @@ function Profile() {
               <TableColumn key="playtime_2weeks">Recently Played</TableColumn>
               <TableColumn key="playtime_forever">Total Time</TableColumn>
             </TableHeader>
-            <TableBody items={recentlyPlayed}>
+            <TableBody items={recentlyPlayed} emptyContent={"Player profile issue"}>
               {(game) => (
                 <TableRow key={game.appid}>
                   <TableCell>
@@ -243,43 +165,6 @@ function Profile() {
           </Table>
         </div>
       </div>
-      <Modal size="lg" isOpen={isOpen} onOpenChange={onOpenChange}>
-        {error && (
-          <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-            {error}
-          </p>
-        )}
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Update Steam Id
-              </ModalHeader>
-              <ModalBody>
-                <form className="my-8" onSubmit={updateInfo}>
-                  <LabelInputContainer className="mb-4">
-                    <Label htmlFor="username">steam Id</Label>
-                    <Input
-                      id="steamId"
-                      placeholder="steamId"
-                      type="text"
-                      ref={steamIdRef}
-                    />
-                  </LabelInputContainer>
-                </form>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={updateInfo}>
-                  Update
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </div>
   );
 }

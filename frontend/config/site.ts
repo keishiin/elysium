@@ -13,12 +13,8 @@ export const siteConfig = {
 			href: "/profile",
 		},
 		{
-			label: "Psn",
-			href: "/psn",
-		},
-		{
-			label: "Xbox",
-			href: "/xbox",
+			label: "User",
+			href: "/user",
 		},
 		{
 			label: "Steam",
@@ -35,12 +31,8 @@ export const siteConfig = {
 			href: "/profile",
 		},
 		{
-			label: "Psn",
-			href: "/psn",
-		},
-		{
-			label: "Xbox",
-			href: "/xbox",
+			label: "User",
+			href: "/user",
 		},
 		{
 			label: "Steam",

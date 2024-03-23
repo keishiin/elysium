@@ -55,7 +55,7 @@ export default function RegisterPage() {
       localStorage.setItem("token", customHeader);
       localStorage.setItem("user", customHeader2);
 
-      router.push("/profile");
+      router.push("/user");
     } catch (err: any) {
       console.log(err);
       setError(err as CustomError);
